@@ -1,0 +1,5 @@
+# generate requirements with pip freeze | grep numpy
+numpy==1.14.5
+matplotlib==3.0.0
+
+
