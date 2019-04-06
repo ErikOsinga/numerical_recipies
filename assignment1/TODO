@@ -1,11 +1,48 @@
 
 - General efficiency
 
-- Question 1a 
+- Question 1a == DONE
 - Remove trapezoid, implement better Romberg
 - Fix interpolation, implement some quadratic method?
 - Implement Ridders method better
 - Look at rejection sampling
 - Implement Histogram binning
 - Implement Quicksort ? (low priority)
+
+
+
+
+======================== KLAD ====================
+
+# Not calculating sum log (xi) up front:
+
+Mass file m14
+Best guess for a,b,c after 204 iterations: [1.87424315 0.64146561 2.7       ]
+Took 2.655181884765625 seconds
+
+----
+
+# Calculating sum log (xi) up front:
+
+Mass file m14
+Best guess for a,b,c after 204 iterations: [1.87424315 0.64146561 2.7       ]
+Took 1.7661831378936768 seconds
+
+----
+
+Mass file m11
+Best guess for a,b,c after 204 iterations: [1.6        0.86227436 2.1       ]
+Took 138.8812301158905 seconds
+(Initial a,b,c is 1.113288, 1.25296, 1.7885)
+
+----
+
+Mass file m11
+Best guess for a,b,c after 204 iterations: [1.6        0.86224971 2.1       ]
+Took 88.61901807785034 seconds
+(Initial a,b,c is 1.2, 1.2, 1.8)
+
+----
+
+All results:
 
