@@ -1,4 +1,8 @@
 import numpy as np
+
+import matplotlib
+matplotlib.use('agg')
+
 import matplotlib.pyplot as plt
 seed = 19231923
 print (f"User seed is set to {seed}")
@@ -67,8 +71,8 @@ plt.hist(all_randnum,bins=np.linspace(0,1,21),edgecolor='black')
 plt.title(f'Histogram of 1 million random numbers')
 plt.xlabel('Value')
 plt.ylabel('Counts')
-plt.show();
-
+#plt.show();
+plt.close()
 
 
 
@@ -595,6 +599,8 @@ print (best_guess, it)
 
 # Plot scipy function
 a,b,c = best_guess_scipy
+A = linInterp(best_guess_scipy)
+
 xs = np.linspace(1e-4,5,100)
 bins = np.logspace(np.log10(1e-4),np.log10(5),21)
 nperbin, _, _ = plt.hist(all_all_x.flatten(), density=True, bins=bins
@@ -623,6 +629,8 @@ plt.close()
 
 # Plot simplex function
 a,b,c = best_guess
+A = linInterp(best_guess)
+
 xs = np.linspace(1e-4,5,100)
 bins = np.logspace(np.log10(1e-4),np.log10(5),21)
 nperbin, _, _ = plt.hist(all_all_x.flatten(), density=True, bins=bins
