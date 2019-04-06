@@ -1,0 +1,11 @@
+
+- General efficiency
+
+- Question 1a 
+- Remove trapezoid, implement better Romberg
+- Fix interpolation, implement some quadratic method?
+- Implement Ridders method better
+- Look at rejection sampling
+- Implement Histogram binning
+- Implement Quicksort ? (low priority)
+
