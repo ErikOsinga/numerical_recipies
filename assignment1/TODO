@@ -3,12 +3,20 @@
 
 - Question 1a == DONE
 - Remove trapezoid, implement better Romberg == DONE, see also: some_open_integrals.ipynb
-- Fix interpolation, implement some quadratic method?
+- Fix interpolation, implement some quadratic method? (See tutorial 1) 
+  --> A quadratic method will perform better in only the last 3 points. 
+  But it will depend very much on b and c as well. But it performs OK for large b, and 
+  for small b it is very good. Thus we implement Nevilles Algorithm for last 3 points
+  
+--> Can also make it more intuitive (same results) by just calling the interpolator with log x and log y values
+--> and then exp ( the y interpolated values ) to get the actual y values for plotting
+--> exp the x values as well.
+
 - Implement Ridders method better == DECIDED THAT ITS FINE
 - Look at rejection sampling
 - Implement Histogram binning == DONE, assume plt.hist can be used without density argument
 - Implement Quicksort ? (low priority)
-- Implement np.argsort for downhill_simplexND (high priority)
+- Implement np.argsort for downhill_simplexND (high priority) == DONE, used selection argsort
 - Check if functions work for c = 3.9
 - Min finding, watch out for local minima? (Restart function if time available perhaps)
 
