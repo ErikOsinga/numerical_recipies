@@ -2,11 +2,11 @@
 - General efficiency
 
 - Question 1a == DONE
-- Remove trapezoid, implement better Romberg == DONE, see some_open_integrals.ipynb
+- Remove trapezoid, implement better Romberg == DONE, see also: some_open_integrals.ipynb
 - Fix interpolation, implement some quadratic method?
-- Implement Ridders method better
+- Implement Ridders method better == DECIDED THAT ITS FINE
 - Look at rejection sampling
-- Implement Histogram binning
+- Implement Histogram binning == DONE, assume plt.hist can be used without density argument
 - Implement Quicksort ? (low priority)
 - Implement np.argsort for downhill_simplexND (high priority)
 - Check if functions work for c = 3.9
@@ -66,7 +66,7 @@ Best guess for a,b,c after 242 iterations: [1.9        0.75697323 2.2       ]
 
 ----
 
-All results with new best guess 
+All results with new best guess [1.5, 0.7, 2.5]
 
 Mass file m11
 Best guess for a,b,c after 213 iterations: [1.46863861 0.97320192 2.5       ]
@@ -78,6 +78,39 @@ Mass file m14
 Best guess for a,b,c after 398 iterations: [2.1        0.5471996  2.20012781]
 Mass file m15
 Best guess for a,b,c after 245 iterations: [1.8        0.83956986 2.5       ]
+
+
+All results with final best guess [1.5, 0.7, 2.7] # from eyeballing the data
+
+
+Mass file m11
+Best guess for a,b,c after 168 iterations: [1.46862962 0.97320158 2.5       ]
+Mass file m12
+Best guess for a,b,c after 290 iterations: [1.7        0.85639542 3.        ]
+Mass file m13
+Best guess for a,b,c after 167 iterations: [1.56172163 0.75474937 2.6       ]
+Mass file m14
+Best guess for a,b,c after 166 iterations: [1.87424112 0.6414661  2.7       ]
+Mass file m15
+Best guess for a,b,c after 271 iterations: [1.8        0.83956984 2.5       ]
+Took 257.80514907836914 seconds
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
