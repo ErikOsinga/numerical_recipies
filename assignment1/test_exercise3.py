@@ -660,15 +660,35 @@ plt.close()
 
 
 
+####  testing m11
+def read_in_halos(filename): 
+    """
+     Read in the data for exercise 3
+    per filename.
 
+    First number in the file on line 4 is always the number of 
+    halos. Then we find hash symbols to indicate a new halo, and 
+    then we find coordinates of satellites (if any) x, phi and 
+    theta.
+    Returns the number of haloes in the datafile and the satellite 
+    positions divided per halo. 
+    """
+    # List of lists of satellite positions x every halo has a list 
+    # of satellite positions x
+    all_satellites = []
+    with open(filename, 'r') as file: 
+        for i, line in enumerate(file):
+            if i == 3:
+                 num_halos = int(line.strip('\n')) 
+            # i = 4 is always the first halo.
+            if i > 4:
+                if '#' in line: # Next halo 
+                    pass
+                else: # append satellite positions coordinates = 
+                    line.strip('\n').split(' ')
+                    # Save only x position, cast to float
+                    coordinates = float(coordinates[0]) 
+                    all_satellites.append(coordinates)
 
-
-
-
-
-
-
-
-
-                            
+    return num_halos, all_satellites
 
