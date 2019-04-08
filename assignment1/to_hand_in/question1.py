@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-seed = 1923
-print (f"User seed is set to {seed}")
+from some_routines import linspace
+
+seed = 19231923
 
 def log_kfac(k):
     """
@@ -37,18 +38,6 @@ def poisson_probability(k,lambd):
     
     return np.exp(k*np.log(lambd) - logkfac - lambd)
 
-# Output P_{\lambda}(k) to at least 6 significant digits for these values
-lambdas = [1,5,3,2.6]
-ks = [0,10,20,40]
-
-for k, lambd in zip(ks, lambdas):
-    print(f'P_{lambd}({k}) = {poisson_probability(k,lambd):.5e}')
-         
-print ("For the bonus:")   
-lambd, k = 101, 200
-print(f'P_{lambd}({k}) = {poisson_probability(k,lambd):.5e}')
-
-
 class RandomGenerator(object):
     """
     Random number generator should be an object because it maintains
@@ -72,6 +61,7 @@ class RandomGenerator(object):
         
         # 64 bit XOR shift values from Numerical Recipes
         self.a1, self.a2, self.a3 = dtyp(21), dtyp(35), dtyp(4)
+
         
     def lincongen(self, X):    
         return (self.a*X+self.c) % self.m
@@ -96,29 +86,44 @@ class RandomGenerator(object):
         # output is XOR of these numbers
         
         return (self.X1^self.X2)/self.max_value
-    
-RNGESUS = RandomGenerator(seed=seed)
 
-# Generate 1000 random numbers. Plot comparison
-all_randnum = []
-for i in range(1000):
-    all_randnum.append(RNGESUS.get_randomnumber())
-    
-plt.plot(all_randnum,np.roll(all_randnum,1),'o',alpha=0.5)
-plt.title(f'Comparison of {len(all_randnum)} random numbers')
-plt.xlabel('Value element n')
-plt.ylabel('Value element n+1')
-plt.savefig('./plots/q1b1.png')
-plt.close()
 
-# Now generate 1 million random numbers. Plot histogram
-all_randnum = []
-for i in range(int(1e6)):
-    all_randnum.append(RNGESUS.get_randomnumber())
-    
-plt.hist(all_randnum,bins=linspace(0,1,21),edgecolor='black')
-plt.title(f'Histogram of 1 million random numbers')
-plt.xlabel('Value')
-plt.ylabel('Counts')
-plt.savefig('./plots/q1b2.png')
-plt.close()
+if __name__ == "__main__":
+    print (f"User seed is set to {seed}")
+
+    # Output P_{\lambda}(k) to at least 6 significant digits for these values
+    lambdas = [1,5,3,2.6]
+    ks = [0,10,20,40]
+
+    for k, lambd in zip(ks, lambdas):
+        print(f'P_{lambd}({k}) = {poisson_probability(k,lambd):.5e}')
+             
+    print ("For the bonus:")   
+    lambd, k = 101, 200
+    print(f'P_{lambd}({k}) = {poisson_probability(k,lambd):.5e}')
+
+    RNGESUS = RandomGenerator(seed=seed)
+
+    # Generate 1000 random numbers. Plot comparison
+    all_randnum = []
+    for i in range(1000):
+        all_randnum.append(RNGESUS.get_randomnumber())
+        
+    plt.plot(all_randnum,np.roll(all_randnum,1),'o',alpha=0.5)
+    plt.title(f'Comparison of {len(all_randnum)} random numbers')
+    plt.xlabel('Value element n')
+    plt.ylabel('Value element n+1')
+    plt.savefig('./plots/q1b1.png')
+    plt.close()
+
+    # Now generate 1 million random numbers. Plot histogram
+    all_randnum = []
+    for i in range(int(1e6)):
+        all_randnum.append(RNGESUS.get_randomnumber())
+        
+    plt.hist(all_randnum,bins=linspace(0,1,21),edgecolor='black')
+    plt.title(f'Histogram of 1 million random numbers')
+    plt.xlabel('Value')
+    plt.ylabel('Counts')
+    plt.savefig('./plots/q1b2.png')
+    plt.close()

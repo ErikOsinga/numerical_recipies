@@ -17,7 +17,7 @@
 - Implement Histogram binning == DONE, assume plt.hist can be used without density argument
 - Implement Quicksort ? (low priority)
 - Implement np.argsort for downhill_simplexND (high priority) == DONE, used selection argsort
-- Check if functions work for c = 3.9
+- Check if functions work for c = 3.9 <-- Medimum priority
 - Min finding, watch out for local minima? (Restart function if time available perhaps)
 
 

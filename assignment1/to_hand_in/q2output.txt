@@ -1,0 +1,13 @@
+For the following 
+a, b, c = (1.1531734093686863, 0.8961819413358973, 2.0407939315663715)
+We find A = 0.11520914842406516
+dn(x)/dx at x=b=0.8961819413358973
+Numerical derivative: -18.385699698232
+Analytical derivative: -18.385699698217
+First root is approximately at 0.0016720164803972139
+Second root is approximately at 0.8781894019637144
+Maximum number in bin 14 Which is between x's:
+[0.19466102 0.33437015]
+Median x: 0.2650139453910556
+16th PCTL: 0.21663036198272176
+84th PCTL: 0.3117425836383838
