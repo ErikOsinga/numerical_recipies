@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from some_routines import linspace, logspace
 
-import question2 as q2
+from question2 import linInterp # the constructed linear interpolator
 
 def neglogL(a,b,c,xi,sumlogxi):
     """
@@ -22,7 +22,7 @@ def neglogL(a,b,c,xi,sumlogxi):
         return 1e6
     
     # We use the trilinear interpolator to approximate A(a,b,c)
-    A = q2.linInterp([a,b,c])
+    A = linInterp([a,b,c])
     
     second_term = sumlogxi
     second_term -= N*np.log(b)

@@ -67,35 +67,36 @@ def romberg(func, lbound, ubound, order=6):
     
     return all_S[order-1,order-1], (all_S[order-1,order-1]-all_S[order-1,order-2])
 
-# Randomly generate a,b,c within asked bounds
-RNGESUS = q1.RandomGenerator(seed=seed)
+if __name__ == "__main__":
+    # Randomly generate a,b,c within asked bounds
+    RNGESUS = q1.RandomGenerator(seed=seed)
 
-a = RNGESUS.get_randomnumber()*(2.5-1.1) + 1.1
-b = RNGESUS.get_randomnumber()*(2.0-0.5) + 0.5
-c = RNGESUS.get_randomnumber()*(4-1.5) + 1.5
+    a = RNGESUS.get_randomnumber()*(2.5-1.1) + 1.1
+    b = RNGESUS.get_randomnumber()*(2.0-0.5) + 0.5
+    c = RNGESUS.get_randomnumber()*(4-1.5) + 1.5
 
-# integral is only a function of x (or r) so add the prefactor manually
-prefactor = 4*np.pi # integral over theta and phi
-Nsat = 100
-print ("For the following ")
-print (f'a, b, c = {a,b,c}')
-integ, error = romberg(lambda x: densprofile(x, a, b, c, Nsat=Nsat
-                        , spherical=True) , 0, 5,order=10)
-integ *= prefactor
-# Normalize such that the integral produces <Nsat>
-A = Nsat/integ
-print (f"We find A = {A}")
+    # integral is only a function of x (or r) so add the prefactor manually
+    prefactor = 4*np.pi # integral over theta and phi
+    Nsat = 100
+    print ("For the following ")
+    print (f'a, b, c = {a,b,c}')
+    integ, error = romberg(lambda x: densprofile(x, a, b, c, Nsat=Nsat
+                            , spherical=True) , 0, 5,order=10)
+    integ *= prefactor
+    # Normalize such that the integral produces <Nsat>
+    A = Nsat/integ
+    print (f"We find A = {A}")
 
-# Make loglog plot to plot the points asked
-points = np.array([1e-4, 1e-2, 1e-1, 1, 5])
-ypoints = densprofile(points,a,b,c,A=A,Nsat=Nsat,spherical=False)
-plt.scatter(points,ypoints)
-plt.xscale('log')
-plt.yscale('log')
-plt.xlim(1e-4,5)
-plt.ylim(ypoints[-1],ypoints[0])
-plt.savefig('./plots/q2b1.png')
-plt.close()
+    # Make loglog plot to plot the points asked
+    points = np.array([1e-4, 1e-2, 1e-1, 1, 5])
+    ypoints = densprofile(points,a,b,c,A=A,Nsat=Nsat,spherical=False)
+    plt.scatter(points,ypoints)
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlim(1e-4,5)
+    plt.ylim(ypoints[-1],ypoints[0])
+    plt.savefig('./plots/q2b1.png')
+    plt.close()
 
 def linear_interpolation(x, f, num_values, begin, end, logx=False):
     """
@@ -185,39 +186,40 @@ So, since c will be somewhere between 1.5 and 4, a quadratic
 polynomial is a best guess. Thus we fit a polynomial of order 2
 between last 3 datapoints with Nevilles algorithm
 """
-# Linearly interpolate between first 3 datapoints, in log-log space
-function = lambda x: densprofile(x,a,b,c,A=A,Nsat=Nsat
-                                     ,spherical=False)
-logfunc = lambda x: np.log(function(x))
+if __name__ == "__main__":
+    # Linearly interpolate between first 3 datapoints, in log-log space
+    function = lambda x: densprofile(x,a,b,c,A=A,Nsat=Nsat
+                                         ,spherical=False)
+    logfunc = lambda x: np.log(function(x))
 
-points = np.array([1e-4, 1e-2, 1e-1, 1, 5])
-ypoints = function(points)
+    points = np.array([1e-4, 1e-2, 1e-1, 1, 5])
+    ypoints = function(points)
 
-# Linear interpolation, 100 datapoints between first 3 datapoints in log-log space
-x_interp_lin, y_interp_lin = linear_interpolation(points[:3],logfunc
-                            , 100, 1e-4, 1e-1, logx=True)
+    # Linear interpolation, 100 datapoints between first 3 datapoints in log-log space
+    x_interp_lin, y_interp_lin = linear_interpolation(points[:3],logfunc
+                                , 100, 1e-4, 1e-1, logx=True)
 
-# Nevilles method for 100 datapoints between last 3 datapoints
-# x in linear space, y in logspace. 
-x_interp_pol = logspace(np.log10(1e-1), np.log10(5), 100)
-y_interp_pol = [recurrence_relation(0,len(points)-3, x_interp_pol[i], 
-            points[2:], logfunc, logx=False) 
-            for i in range(len(x_interp_pol)) ]
+    # Nevilles method for 100 datapoints between last 3 datapoints
+    # x in linear space, y in logspace. 
+    x_interp_pol = logspace(np.log10(1e-1), np.log10(5), 100)
+    y_interp_pol = [recurrence_relation(0,len(points)-3, x_interp_pol[i], 
+                points[2:], logfunc, logx=False) 
+                for i in range(len(x_interp_pol)) ]
 
-# Combine them and transform to first x half to lin space
-# and both y halves to lin space for plotting
-x_interp = np.append(np.exp(x_interp_lin),x_interp_pol)
-y_interp = np.exp(np.append(y_interp_lin,y_interp_pol))
+    # Combine them and transform to first x half to lin space
+    # and both y halves to lin space for plotting
+    x_interp = np.append(np.exp(x_interp_lin),x_interp_pol)
+    y_interp = np.exp(np.append(y_interp_lin,y_interp_pol))
 
-plt.plot(x_interp,y_interp,label='Interpolation',c='g')
-# plt.plot(x_interp, function(x_interp),label='True function', ls='dashed')
-plt.scatter(points,ypoints, c='k',label='Datapoints')
-plt.legend()
-plt.title('Two interpolation methods in different spaces')
-plt.xscale('log')
-plt.yscale('log')
-plt.savefig('./plots/q2b2.png')
-plt.close()
+    plt.plot(x_interp,y_interp,label='Interpolation',c='g')
+    # plt.plot(x_interp, function(x_interp),label='True function', ls='dashed')
+    plt.scatter(points,ypoints, c='k',label='Datapoints')
+    plt.legend()
+    plt.title('Two interpolation methods in different spaces')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.savefig('./plots/q2b2.png')
+    plt.close()
 
 
 
@@ -280,15 +282,15 @@ def ridders_method(func, x, d, m, target_error):
 
     return all_D[m-1,m-1], error
 
+if __name__ == "__main__":
+    # Output the numerical derivative alongside the analytical one 
+    # to at least 12 significant digits.
+    print (f"dn(x)/dx at x=b={b}")
+    ridder, error = ridders_method(function, b, d=2, m=15, target_error=1e-15)
+    print(f'Numerical derivative: {ridder:.12f}')
 
-# Output the numerical derivative alongside the analytical one 
-# to at least 12 significant digits.
-print (f"dn(x)/dx at x=b={b}")
-ridder, error = ridders_method(function, b, d=2, m=15, target_error=1e-15)
-print(f'Numerical derivative: {ridder:.12f}')
-
-analderiv = anal_deriv(b,a,b,c,A,Nsat)
-print(f'Analytical derivative: {analderiv:.12f}')
+    analderiv = anal_deriv(b,a,b,c,A,Nsat)
+    print(f'Analytical derivative: {analderiv:.12f}')
 
 
 def pdfRadii(x, a, b, c, A):
@@ -322,7 +324,8 @@ def rejection_sampling(RNG, pdf, x_begin, x_end, num_points=500):
     
     return all_x
 
-RNG = RNGESUS.get_randomnumber # random number generator func
+if __name__ == "__main__":
+    RNG = RNGESUS.get_randomnumber # random number generator func
 
 
 def inverse_transform_sample(RNG, invcdf, num_points=500):
@@ -381,52 +384,53 @@ def output_N_satellites(RNG, pdf, N):
 
     return all_x, all_theta, all_phi
     
-# Output the positions for 100 such satellites, with current a,b,c and A
-thispdf = lambda x: pdfRadii(x,a,b,c,A)
-all_x, all_theta, all_phi = output_N_satellites(RNG,thispdf,N=100)
-np.savetxt('./satellitepositions.txt',np.transpose([all_x,all_theta,all_phi]))
-# Positions are output in PDF file 
+if __name__ == "__main__":
+    # Output the positions for 100 such satellites, with current a,b,c and A
+    thispdf = lambda x: pdfRadii(x,a,b,c,A)
+    all_x, all_theta, all_phi = output_N_satellites(RNG,thispdf,N=100)
+    np.savetxt('./satellitepositions.txt',np.transpose([all_x,all_theta,all_phi]))
+    # Positions are output in PDF file 
 
-# Repeat d) for 1000 halos with 100 satellites each.
-all_all_x, all_all_theta, all_all_phi = [], [], []
-for i in range(1000):
-    all_x, all_theta, all_phi = output_N_satellites(RNG,thispdf, N=100)
-    all_all_x.append(all_x)
-    all_all_theta.append(all_theta)
-    all_all_phi.append(all_phi)
+    # Repeat d) for 1000 halos with 100 satellites each.
+    all_all_x, all_all_theta, all_all_phi = [], [], []
+    for i in range(1000):
+        all_x, all_theta, all_phi = output_N_satellites(RNG,thispdf, N=100)
+        all_all_x.append(all_x)
+        all_all_theta.append(all_theta)
+        all_all_phi.append(all_phi)
 
-all_all_x = np.asarray(all_all_x)
+    all_all_x = np.asarray(all_all_x)
 
-# Make another log-log plot, showing N(x).
-xs = linspace(1e-4,5,100) # sampled along x
-# Generate 20 logarithmically equal spaced bins between 1e-4 and 5
-bins = logspace(np.log10(1e-4),np.log10(5),21)
-# Plot it as histogram
-nperbin, _, _ = plt.hist(all_all_x.flatten(), bins=bins
-                         ,alpha=0.5,label='data')
-plt.close() # We could also set density is true, but since I am unsure
-# whether this is allowed, we shall normalize it manually.
+    # Make another log-log plot, showing N(x).
+    xs = linspace(1e-4,5,100) # sampled along x
+    # Generate 20 logarithmically equal spaced bins between 1e-4 and 5
+    bins = logspace(np.log10(1e-4),np.log10(5),21)
+    # Plot it as histogram
+    nperbin, _, _ = plt.hist(all_all_x.flatten(), bins=bins
+                             ,alpha=0.5,label='data')
+    plt.close() # We could also set density is true, but since I am unsure
+    # whether this is allowed, we shall normalize it manually.
 
-bin_centers = (bins[:-1] + bins[1:])/2
-binwidths = (bins[1:] - bins[:-1])
-# Divide each bin by its width
-# And divide by the total count to normalize
-nperbin /= binwidths*np.sum(nperbin)
+    bin_centers = (bins[:-1] + bins[1:])/2
+    binwidths = (bins[1:] - bins[:-1])
+    # Divide each bin by its width
+    # And divide by the total count to normalize
+    nperbin /= binwidths*np.sum(nperbin)
 
-# Normalized histogram
-plt.bar(bin_centers,nperbin,binwidths,label='data',alpha=0.5)
-# Analytical function
-plt.plot(xs, thispdf(xs),label='analytical PDF',c='C1') # plot N(x)=n(x)*4pi*x^2
+    # Normalized histogram
+    plt.bar(bin_centers,nperbin,binwidths,label='data',alpha=0.5)
+    # Analytical function
+    plt.plot(xs, thispdf(xs),label='analytical PDF',c='C1') # plot N(x)=n(x)*4pi*x^2
 
-plt.legend(frameon=True)
-plt.xlabel('x')
-plt.ylabel('Probability or normalized counts')
-plt.yscale('log')
-plt.xscale('log')
-plt.ylim(1e-7,findmax([findmax(thispdf(xs)),findmax(nperbin)]))
-plt.savefig('./plots/q2e1.png')
-plt.close()
-# The galaxies match the distribution very well
+    plt.legend(frameon=True)
+    plt.xlabel('x')
+    plt.ylabel('Probability or normalized counts')
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.ylim(1e-7,findmax([findmax(thispdf(xs)),findmax(nperbin)]))
+    plt.savefig('./plots/q2e1.png')
+    plt.close()
+    # The galaxies match the distribution very well
 
 
 # Root finding 
@@ -481,31 +485,32 @@ def false_position(func, lower, upper, acc, MAX=100):
         
     return x1, x2, i+1
 
-# Use analytical formula to find the position of the maximum
-xmax = position_of_maxNx(a,b,c)
-ymax = thispdf(xmax)
+if __name__ == "__main__":
+    # Use analytical formula to find the position of the maximum
+    xmax = position_of_maxNx(a,b,c)
+    ymax = thispdf(xmax)
 
-# Then use root finding to find where the function-ymax/2 is 0
-function = lambda x: thispdf(x) - ymax/2
+    # Then use root finding to find where the function-ymax/2 is 0
+    function = lambda x: thispdf(x) - ymax/2
 
-# Secant is not a good option, because we will likely diverge 
-# Due to the linear approximation of the function not being very good
-# Therefore, we use the false position method, since it will not diverge
-# And we know very well where the roots will be
+    # Secant is not a good option, because we will likely diverge 
+    # Due to the linear approximation of the function not being very good
+    # Therefore, we use the false position method, since it will not diverge
+    # And we know very well where the roots will be
 
-acc = 1e-8
-# First root will be between starting value and x of the maximum
-xlower1, xupper1, itneeded1 = false_position(function, 1e-4,xmax,acc)
-# Second root will be x of the maximum and 5
-xlower2, xupper2, itneeded2 = false_position(function, xmax,5, acc)
+    acc = 1e-8
+    # First root will be between starting value and x of the maximum
+    xlower1, xupper1, itneeded1 = false_position(function, 1e-4,xmax,acc)
+    # Second root will be x of the maximum and 5
+    xlower2, xupper2, itneeded2 = false_position(function, xmax,5, acc)
 
-best_guess1 = (xlower1+xupper1)/2
-best_guess2 = (xlower2+xupper2)/2
-print (f"First root is approximately at {best_guess1}")
-# print (f"{itneeded1} iterations were needed")
+    best_guess1 = (xlower1+xupper1)/2
+    best_guess2 = (xlower2+xupper2)/2
+    print (f"First root is approximately at {best_guess1}")
+    # print (f"{itneeded1} iterations were needed")
 
-print (f"Second root is approximately at {best_guess2}")
-# print (f"{itneeded2} iterations were needed")
+    print (f"Second root is approximately at {best_guess2}")
+    # print (f"{itneeded2} iterations were needed")
 
 
 def find_position_maximum(array):
@@ -581,80 +586,85 @@ def give_percentile(sorted_arr, percentile):
         return (sorted_arr[index] + sorted_arr[index+1])/2
             
 
+if __name__ == "__main__":
+    # Bin containing largest number of galaxies
+    max_n = find_position_maximum(nperbin)
+    # boundaries of the bin
+    lower_x = bins[max_n]
+    upper_x = bins[max_n+1]
 
-# Bin containing largest number of galaxies
-max_n = find_position_maximum(nperbin)
-# boundaries of the bin
-lower_x = bins[max_n]
-upper_x = bins[max_n+1]
+
+    # Find the x values of the satellites per halo
+    # that are in the specified bin. Shape (1000,?)
+    halo_satellites_in_bin = []
+    for i in range(0,all_all_x.shape[0]):
+        satellites_in_bin = []
+        for j in range(0,all_all_x.shape[1]):
+            if all_all_x[i,j] > lower_x and all_all_x[i,j] < upper_x:
+                satellites_in_bin.append(all_all_x[i,j])
+        halo_satellites_in_bin.append(satellites_in_bin)
+        
+    # Concatenate (i.e., flatten) the list of lists
+    total_satellites_in_bin = np.concatenate(halo_satellites_in_bin)
+    # Sorted
+    quicksort(total_satellites_in_bin)
+
+    median = give_percentile(total_satellites_in_bin,50)
+    sixteent = give_percentile(total_satellites_in_bin, 16)
+    eightyfth = give_percentile(total_satellites_in_bin, 84)
+
+    print ("Maximum number in bin", max_n, "Which is between x's:")
+    print (bins[max_n:max_n+2])
+
+    print (f"Median x: {median}")
+    print (f"16th PCTL: {sixteent}")
+    print (f"84th PCTL: {eightyfth}")
+
+    # Now make a histogram of the number of galaxies in this radial bin in each halo
+
+    # Thus, in each halo, store the number of satellites in the specified bin
+    num_satellites_bin = [] # shape (1000,)
+    for halo in range(0,len(halo_satellites_in_bin)):
+        # amount of satellites within the specified bin in this halo
+        amount_in_bin = (len(halo_satellites_in_bin[halo]))
+        num_satellites_bin.append(amount_in_bin)
+
+    # Each bin should have a width of 1
+    max_num = findmax(num_satellites_bin)
+    min_num = findmin(num_satellites_bin)
+    bins = linspace(min_num, max_num, max_num-min_num+1)
+
+    mean_num = np.mean(num_satellites_bin)
+    poisson_prob = q1.poisson_probability(bins,mean_num)
+
+    nperbin, _, _ = plt.hist(num_satellites_bin, bins=bins
+                             ,alpha=0.5,label='data')
+    plt.close() # We could also set density is true, but since I am unsure
+    # whether this is allowed, we shall normalize it manually.
+    bin_centers = (bins[:-1] + bins[1:])/2
+    binwidths = (bins[1:] - bins[:-1])
+    # Divide each bin by its width
+    # And divide by the total count to normalize
+    nperbin /= binwidths*np.sum(nperbin)
+
+    # Normalized histogram
+    plt.bar(bin_centers,nperbin,binwidths,label='data',alpha=0.5)
+    plt.plot(bins,poisson_prob,label='Poisson PDF',color='C1')
+    plt.xlabel('Number of galaxies in specified bin')
+    plt.ylabel('Normalized counts or probability')
+    plt.legend()
+    plt.savefig('./plots/q2g1.png')
+    plt.close()
 
 
-# Find the x values of the satellites per halo
-# that are in the specified bin. Shape (1000,?)
-halo_satellites_in_bin = []
-for i in range(0,all_all_x.shape[0]):
-    satellites_in_bin = []
-    for j in range(0,all_all_x.shape[1]):
-        if all_all_x[i,j] > lower_x and all_all_x[i,j] < upper_x:
-            satellites_in_bin.append(all_all_x[i,j])
-    halo_satellites_in_bin.append(satellites_in_bin)
-    
-# Concatenate (i.e., flatten) the list of lists
-total_satellites_in_bin = np.concatenate(halo_satellites_in_bin)
-# Sorted
-quicksort(total_satellites_in_bin)
-
-median = give_percentile(total_satellites_in_bin,50)
-sixteent = give_percentile(total_satellites_in_bin, 16)
-eightyfth = give_percentile(total_satellites_in_bin, 84)
-
-print ("Maximum number in bin", max_n, "Which is between x's:")
-print (bins[max_n:max_n+2])
-
-print (f"Median x: {median}")
-print (f"16th PCTL: {sixteent}")
-print (f"84th PCTL: {eightyfth}")
-
-# Now make a histogram of the number of galaxies in this radial bin in each halo
-
-# Thus, in each halo, store the number of satellites in the specified bin
-num_satellites_bin = [] # shape (1000,)
-for halo in range(0,len(halo_satellites_in_bin)):
-    # amount of satellites within the specified bin in this halo
-    amount_in_bin = (len(halo_satellites_in_bin[halo]))
-    num_satellites_bin.append(amount_in_bin)
-
-# Each bin should have a width of 1
-max_num = findmax(num_satellites_bin)
-min_num = findmin(num_satellites_bin)
-bins = linspace(min_num, max_num, max_num-min_num+1)
-
-mean_num = np.mean(num_satellites_bin)
-poisson_prob = q1.poisson_probability(bins,mean_num)
-
-nperbin, _, _ = plt.hist(num_satellites_bin, bins=bins
-                         ,alpha=0.5,label='data')
-plt.close() # We could also set density is true, but since I am unsure
-# whether this is allowed, we shall normalize it manually.
-bin_centers = (bins[:-1] + bins[1:])/2
-binwidths = (bins[1:] - bins[:-1])
-# Divide each bin by its width
-# And divide by the total count to normalize
-nperbin /= binwidths*np.sum(nperbin)
-
-# Normalized histogram
-plt.bar(bin_centers,nperbin,binwidths,label='data',alpha=0.5)
-plt.plot(bins,poisson_prob,label='Poisson PDF',color='C1')
-plt.xlabel('Number of galaxies in specified bin')
-plt.ylabel('Normalized counts or probability')
-plt.legend()
-plt.savefig('./plots/q2g1.png')
-plt.close()
 
 # Normalization factor A depends on a,b,c. Calculate a regularly spaced A grid.
 a_range = linspace(1.1,2.5,int((2.5-1.1)*10)+1) # 0.1 wide intervals
 b_range = linspace(0.5,2,int((2-0.5)*10)+1)
 c_range = linspace(1.5,4,int((4-1.5)*10)+1)
+
+prefactor = 4*np.pi
+Nsat = 100
 
 # 3D array to save the results, shape = (15,16,26)
 results = np.empty((len(a_range),len(b_range),len(c_range)))
