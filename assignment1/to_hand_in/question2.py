@@ -584,103 +584,7 @@ def give_percentile(sorted_arr, percentile):
         # Midpoint interpolation
         index = int(index)
         return (sorted_arr[index] + sorted_arr[index+1])/2
-            
-
-if __name__ == "__main__":
-    # Bin containing largest number of galaxies
-    max_n = find_position_maximum(nperbin)
-    # boundaries of the bin
-    lower_x = bins[max_n]
-    upper_x = bins[max_n+1]
-
-
-    # Find the x values of the satellites per halo
-    # that are in the specified bin. Shape (1000,?)
-    halo_satellites_in_bin = []
-    for i in range(0,all_all_x.shape[0]):
-        satellites_in_bin = []
-        for j in range(0,all_all_x.shape[1]):
-            if all_all_x[i,j] > lower_x and all_all_x[i,j] < upper_x:
-                satellites_in_bin.append(all_all_x[i,j])
-        halo_satellites_in_bin.append(satellites_in_bin)
         
-    # Concatenate (i.e., flatten) the list of lists
-    total_satellites_in_bin = np.concatenate(halo_satellites_in_bin)
-    # Sorted
-    quicksort(total_satellites_in_bin)
-
-    median = give_percentile(total_satellites_in_bin,50)
-    sixteent = give_percentile(total_satellites_in_bin, 16)
-    eightyfth = give_percentile(total_satellites_in_bin, 84)
-
-    print ("Maximum number in bin", max_n, "Which is between x's:")
-    print (bins[max_n:max_n+2])
-
-    print (f"Median x: {median}")
-    print (f"16th PCTL: {sixteent}")
-    print (f"84th PCTL: {eightyfth}")
-
-    # Now make a histogram of the number of galaxies in this radial bin in each halo
-
-    # Thus, in each halo, store the number of satellites in the specified bin
-    num_satellites_bin = [] # shape (1000,)
-    for halo in range(0,len(halo_satellites_in_bin)):
-        # amount of satellites within the specified bin in this halo
-        amount_in_bin = (len(halo_satellites_in_bin[halo]))
-        num_satellites_bin.append(amount_in_bin)
-
-    # Each bin should have a width of 1
-    max_num = findmax(num_satellites_bin)
-    min_num = findmin(num_satellites_bin)
-    bins = linspace(min_num, max_num, max_num-min_num+1)
-
-    mean_num = np.mean(num_satellites_bin)
-    poisson_prob = q1.poisson_probability(bins,mean_num)
-
-    nperbin, _, _ = plt.hist(num_satellites_bin, bins=bins
-                             ,alpha=0.5,label='data')
-    plt.close() # We could also set density is true, but since I am unsure
-    # whether this is allowed, we shall normalize it manually.
-    bin_centers = (bins[:-1] + bins[1:])/2
-    binwidths = (bins[1:] - bins[:-1])
-    # Divide each bin by its width
-    # And divide by the total count to normalize
-    nperbin /= binwidths*np.sum(nperbin)
-
-    # Normalized histogram
-    plt.bar(bin_centers,nperbin,binwidths,label='data',alpha=0.5)
-    plt.plot(bins,poisson_prob,label='Poisson PDF',color='C1')
-    plt.xlabel('Number of galaxies in specified bin')
-    plt.ylabel('Normalized counts or probability')
-    plt.legend()
-    plt.savefig('./plots/q2g1.png')
-    plt.close()
-
-
-
-# Normalization factor A depends on a,b,c. Calculate a regularly spaced A grid.
-a_range = linspace(1.1,2.5,int((2.5-1.1)*10)+1) # 0.1 wide intervals
-b_range = linspace(0.5,2,int((2-0.5)*10)+1)
-c_range = linspace(1.5,4,int((4-1.5)*10)+1)
-
-prefactor = 4*np.pi
-Nsat = 100
-
-# 3D array to save the results, shape = (15,16,26)
-results = np.empty((len(a_range),len(b_range),len(c_range)))
-for a_indx in range(0,len(a_range)):
-    for b_indx in range(0,len(b_range)):
-        for c_indx in range(0,len(c_range)):
-            # Calculate the integral
-            integ, error = romberg(lambda x: densprofile(
-                x, a_range[a_indx], b_range[b_indx], c_range[c_indx]
-                , Nsat=Nsat, spherical=True) , 0, 5,order=10)
-            integ *= prefactor
-            # Normalize such that the integral produces <Nsat>
-            A = Nsat/integ
-            
-            results[a_indx,b_indx,c_indx] = A
-
 # Linear interpolation is probably pretty good, as 
 # we have a quite regularly sampled grid
 class LinearInterp3D(object):
@@ -740,9 +644,107 @@ class LinearInterp3D(object):
             indices.append( int( (coordinates[i]-self.points[i][0])/0.1 ) )
         return np.asarray(indices)
 
-# Construct the interpolator
-linInterp = LinearInterp3D([a_range,b_range,c_range],results)
-# Example of how to interpolate a point:  linInterp([1.41,0.65,2.57]) 
 
 
+if __name__ == "__main__":
+    # Bin containing largest number of galaxies
+    max_n = find_position_maximum(nperbin)
+    # boundaries of the bin
+    lower_x = bins[max_n]
+    upper_x = bins[max_n+1]
 
+
+    # Find the x values of the satellites per halo
+    # that are in the specified bin. Shape (1000,?)
+    halo_satellites_in_bin = []
+    for i in range(0,all_all_x.shape[0]):
+        satellites_in_bin = []
+        for j in range(0,all_all_x.shape[1]):
+            if all_all_x[i,j] > lower_x and all_all_x[i,j] < upper_x:
+                satellites_in_bin.append(all_all_x[i,j])
+        halo_satellites_in_bin.append(satellites_in_bin)
+        
+    # Concatenate (i.e., flatten) the list of lists
+    total_satellites_in_bin = np.concatenate(halo_satellites_in_bin)
+    # Sorted
+    quicksort(total_satellites_in_bin)
+
+    median = give_percentile(total_satellites_in_bin,50)
+    sixteent = give_percentile(total_satellites_in_bin, 16)
+    eightyfth = give_percentile(total_satellites_in_bin, 84)
+
+    print ("Maximum number in bin", max_n, "which is between x's:")
+    print (bins[max_n:max_n+2])
+
+    print (f"Median x: {median}")
+    print (f"16th PCTL: {sixteent}")
+    print (f"84th PCTL: {eightyfth}")
+
+    # Now make a histogram of the number of galaxies in this radial bin in each halo
+
+    # Thus, in each halo, store the number of satellites in the specified bin
+    num_satellites_bin = [] # shape (1000,)
+    for halo in range(0,len(halo_satellites_in_bin)):
+        # amount of satellites within the specified bin in this halo
+        amount_in_bin = (len(halo_satellites_in_bin[halo]))
+        num_satellites_bin.append(amount_in_bin)
+
+    # Each bin should have a width of 1
+    max_num = findmax(num_satellites_bin)
+    min_num = findmin(num_satellites_bin)
+    bins = linspace(min_num, max_num, max_num-min_num+1)
+
+    mean_num = np.mean(num_satellites_bin)
+    poisson_prob = q1.poisson_probability(bins,mean_num)
+
+    nperbin, _, _ = plt.hist(num_satellites_bin, bins=bins
+                             ,alpha=0.5,label='data')
+    plt.close() # We could also set density is true, but since I am unsure
+    # whether this is allowed, we shall normalize it manually.
+    bin_centers = (bins[:-1] + bins[1:])/2
+    binwidths = (bins[1:] - bins[:-1])
+    # Divide each bin by its width
+    # And divide by the total count to normalize
+    nperbin /= binwidths*np.sum(nperbin)
+
+    # Normalized histogram
+    plt.bar(bin_centers,nperbin,binwidths,label='data',alpha=0.5)
+    plt.plot(bins,poisson_prob,label='Poisson PDF',color='C1')
+    plt.xlabel('Number of galaxies in specified bin')
+    plt.ylabel('Normalized counts or probability')
+    plt.legend()
+    plt.savefig('./plots/q2g1.png')
+    plt.close()
+
+
+    # Interpolation
+
+    # Normalization factor A depends on a,b,c. Calculate a regularly spaced A grid.
+    a_range = linspace(1.1,2.5,int((2.5-1.1)*10)+1) # 0.1 wide intervals
+    b_range = linspace(0.5,2,int((2-0.5)*10)+1)
+    c_range = linspace(1.5,4,int((4-1.5)*10)+1)
+
+    prefactor = 4*np.pi
+    Nsat = 100
+
+    # 3D array to save the results, shape = (15,16,26)
+    results = np.empty((len(a_range),len(b_range),len(c_range)))
+    for a_indx in range(0,len(a_range)):
+        for b_indx in range(0,len(b_range)):
+            for c_indx in range(0,len(c_range)):
+                # Calculate the integral
+                integ, error = romberg(lambda x: densprofile(
+                    x, a_range[a_indx], b_range[b_indx], c_range[c_indx]
+                    , Nsat=Nsat, spherical=True) , 0, 5,order=10)
+                integ *= prefactor
+                # Normalize such that the integral produces <Nsat>
+                A = Nsat/integ
+                
+                results[a_indx,b_indx,c_indx] = A
+
+    # Save results, because we need it in question 3
+    np.save('./A_values_grid.npy',results)
+
+    # Construct the interpolator
+    linInterp = LinearInterp3D([a_range,b_range,c_range],results)
+    # Example of how to interpolate a point:  linInterp([1.41,0.65,2.57]) 

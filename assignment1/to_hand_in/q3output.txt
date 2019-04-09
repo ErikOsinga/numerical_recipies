@@ -1,10 +1,10 @@
 Mass file m11
-Best guess for a,b,c after 168 iterations: [1.46862962 0.97320158 2.5       ]
+Best guess for a,b,c after 109 iterations: [1.37135494 1.06064371 2.85535282]
 Mass file m12
-Best guess for a,b,c after 290 iterations: [1.7        0.85639542 3.        ]
+Best guess for a,b,c after 289 iterations: [1.7        0.85639407 3.        ]
 Mass file m13
-Best guess for a,b,c after 158 iterations: [1.5617214 0.7547494 2.6      ]
+Best guess for a,b,c after 108 iterations: [1.41965568 0.84132805 3.11546913]
 Mass file m14
-Best guess for a,b,c after 166 iterations: [1.87424112 0.6414661  2.7       ]
+Best guess for a,b,c after 155 iterations: [1.68213764 0.72399079 3.3       ]
 Mass file m15
-Best guess for a,b,c after 273 iterations: [1.8        0.83956981 2.5       ]
+Best guess for a,b,c after 202 iterations: [1.8        0.83956984 2.5       ]

@@ -107,16 +107,149 @@ Took 257.80514907836914 seconds
 
 
 
+Calculating everything without 3b):
+
+User seed is set to 19231923
+P_1(0) = 3.67879e-01
+P_5(10) = 1.81328e-02
+P_3(20) = 7.13538e-11
+P_2.6(40) = 3.61512e-33
+For the bonus:
+P_101(200) = 1.26953e-18
+For the following 
+a, b, c = (1.1531734093686863, 0.8961819413358973, 2.0407939315663715)
+We find A = 0.11520914842406516
+dn(x)/dx at x=b=0.8961819413358973
+Numerical derivative: -18.385699698232
+Analytical derivative: -18.385699698217
+First root is approximately at 0.0016720164803972139
+Second root is approximately at 0.8781894019637144
+Maximum number in bin 14 Which is between x's:
+[0.19466102 0.33437015]
+Median x: 0.2650139453910556
+16th PCTL: 0.21663036198272176
+84th PCTL: 0.3117425836383838
+Mass file m11
+Best guess for a,b,c after 168 iterations: [1.46862962 0.97320158 2.5       ]
+Mass file m12
+Best guess for a,b,c after 290 iterations: [1.7        0.85639542 3.        ]
+Mass file m13
+Best guess for a,b,c after 158 iterations: [1.5617214 0.7547494 2.6      ]
+Mass file m14
+Best guess for a,b,c after 166 iterations: [1.87424112 0.6414661  2.7       ]
+Mass file m15
+Best guess for a,b,c after 273 iterations: [1.8        0.83956981 2.5       ]
+
+real	9m28.432s
+user	8m51.386s
+sys	0m29.815s
 
 
+Cutting it very close. Time per question:
+reusel [1010] $ time python3 question1.py 2>&1 | tee q1output.txt
+User seed is set to 19231923
+P_1(0) = 3.67879e-01
+P_5(10) = 1.81328e-02
+P_3(20) = 7.13538e-11
+P_2.6(40) = 3.61512e-33
+For the bonus:
+P_101(200) = 1.26953e-18
+
+real	0m11.626s
+user	0m10.739s
+sys	0m0.694s
 
 
+reusel [1011] $ time python3 question2.py 2>&1 | tee q2output.txt
+For the following 
+a, b, c = (1.1531734093686863, 0.8961819413358973, 2.0407939315663715)
+We find A = 0.11520914842406516
+dn(x)/dx at x=b=0.8961819413358973
+Numerical derivative: -18.385699698232
+Analytical derivative: -18.385699698217
+First root is approximately at 0.0016720164803972139
+Second root is approximately at 0.8781894019637144
+Maximum number in bin 14 Which is between x's:
+[0.19466102 0.33437015]
+Median x: 0.2650139453910556
+16th PCTL: 0.21663036198272176
+84th PCTL: 0.3117425836383838
+
+real	0m32.572s
+user	0m32.323s
+sys	0m1.326s
 
 
+Mass file m11
+Best guess for a,b,c after 168 iterations: [1.46862962 0.97320158 2.5       ]
+Mass file m12
+Best guess for a,b,c after 290 iterations: [1.7        0.85639542 3.        ]
+Mass file m13
+Best guess for a,b,c after 158 iterations: [1.5617214 0.7547494 2.6      ]
+Mass file m14
+Best guess for a,b,c after 166 iterations: [1.87424112 0.6414661  2.7       ]
+Mass file m15
+Best guess for a,b,c after 273 iterations: [1.8        0.83956981 2.5       ]
+
+real	8m50.322s
+user	8m13.785s
+sys	0m25.847s
 
 
+So the major slowdown is 3. I don't think it is the loading of the data:
+11
+CPU times: user 5.56 s, sys: 64.2 ms, total: 5.63 s
+Wall time: 5.68 s
+12
+CPU times: user 1.34 s, sys: 26.7 ms, total: 1.36 s
+Wall time: 1.41 s
+13
+CPU times: user 172 ms, sys: 2.85 ms, total: 174 ms
+Wall time: 179 ms
+14
+CPU times: user 11.9 ms, sys: 0 ns, total: 11.9 ms
+Wall time: 12 ms
+15
+CPU times: user 1.31 ms, sys: 1 µs, total: 1.31 ms
+Wall time: 1.32 ms
+
+Trying to increase the vertex size from 0.01 to 0.1 now
+
+reusel [1013] $ time python3 question3.py 2>&1 | tee q3output.txt
+Mass file m11
+Best guess for a,b,c after 218 iterations: [1.46863859 0.97320191 2.5       ]
+Mass file m12
+Best guess for a,b,c after 275 iterations: [1.7      0.856394 3.      ]
+Mass file m13
+Best guess for a,b,c after 141 iterations: [1.56172178 0.75474932 2.6       ]
+Mass file m14
+Best guess for a,b,c after 190 iterations: [1.87424137 0.64146608 2.7       ]
+Mass file m15
+Best guess for a,b,c after 183 iterations: [1.8        0.83957226 2.5       ]
+
+real	8m55.967s
+user	8m24.260s
+sys	0m26.865s
+
+Costs us 5 seconds more lol. How about 0.5?
+reusel [1013] $ time python3 question3.py 2>&1 | tee q3output.txt
+Mass file m11
+Best guess for a,b,c after 109 iterations: [1.37135494 1.06064371 2.85535282]
+Mass file m12
+Best guess for a,b,c after 289 iterations: [1.7        0.85639407 3.        ]
+Mass file m13
+Best guess for a,b,c after 108 iterations: [1.41965568 0.84132805 3.11546913]
+Mass file m14
+Best guess for a,b,c after 155 iterations: [1.68213764 0.72399079 3.3       ]
+Mass file m15
+Best guess for a,b,c after 202 iterations: [1.8        0.83956984 2.5       ]
+
+real	7m50.691s
+user	7m18.657s
+sys	0m22.963s
 
 
+This actually seems better. 
 
 
 

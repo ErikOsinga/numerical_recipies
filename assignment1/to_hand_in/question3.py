@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from some_routines import linspace, logspace
 
-from question2 import linInterp # the constructed linear interpolator
+from question2 import LinearInterp3D
 
 def neglogL(a,b,c,xi,sumlogxi):
     """
@@ -19,7 +19,7 @@ def neglogL(a,b,c,xi,sumlogxi):
     
     if (not(1.1 < a <2.5) or not(0.5 < b < 2) or not(1.5 < c < 4)):
         # a b or c is not in required bound, return high value
-        return 1e6
+        return 1e100
     
     # We use the trilinear interpolator to approximate A(a,b,c)
     A = linInterp([a,b,c])
@@ -175,18 +175,26 @@ def find_abc(i):
     # Function to minimize
     minfunc = lambda x, y, z: neglogL(x,y,z,all_satellites,sumlogxi)
     
-    # Downhill simplex method
-    
+    # Downhill simplex method to find the minimum in 3D
     initial_guess = [1.5, 0.7, 2.7] # from eyeballing the data
     best, vertices, it = downhill_simplexND(minfunc, initial_guess
-                                        , 0.01,tol=1e-15,maxIter=500)
-    return all_satellites, best, it
+                                        , 0.5,tol=1e-15,maxIter=500)
+    return best, it
     
+
+# Construct the linear interpolator from question 2
+a_range = linspace(1.1,2.5,int((2.5-1.1)*10)+1) # 0.1 wide intervals
+b_range = linspace(0.5,2,int((2-0.5)*10)+1)
+c_range = linspace(1.5,4,int((4-1.5)*10)+1)
+results = np.load('./A_values_grid.npy')
+
+# Needed to calculate A(a,b,c)
+linInterp = LinearInterp3D([a_range,b_range,c_range],results)
 
 # We minimize with the downhill simplex method
 all_best = [] # save best (a,b,c) for every mass file
 for i in [11,12,13,14,15]:
-    all_satellites, best, it = find_abc(i)
+    best, it = find_abc(i)
     all_best.append(best)
     print (f"Mass file m{i}")
     print (f"Best guess for a,b,c after {it} iterations: {best}")
@@ -194,23 +202,84 @@ for i in [11,12,13,14,15]:
 
 all_best = np.asarray(all_best)
 
-plt.scatter(range(11,16),all_best[:,0])
+"""
+Since there is some unknown uncertainty in the points $a$, $b$ and $c$ that 
+we have calculated, fitting a function to these points makes more sense than
+interpolating between these points. This comes with the additional advantage 
+that fitting a function that does not have to go through each point exactly
+is easier than writing an interpolator that does not have to go through each
+point. If we fit a function first, this function can then be used as an 
+interpolator. $a$ Seems to be positively correlated with halo mass, where the
+points perhaps have some scatter around the best fitting line. 
+Thus we fit a linear model using a least squares fit. 
+
+Conversely, $c$ seems to be negatively correlated with halo mass,
+except the point $c$ of the final mass bin. We remove this point from the data,
+as it seems like an outlier. Since mass bin 15 has the least amount of data,
+this is a probable explanation for the datapoint. A linear model using a least
+squares fit is then also fit to $c$. 
+
+For $b$ the problem is a little less straightforward. By eye no easy-to-spot
+correlation is visible. However, if we assume that point $c$ in the last mass 
+bin was an outlier, then point $b$ in the last mass bin is probably not correct
+either. Removing the last point of $b$ allows for a linear model as well
+which we fit with least squares.
+
+"""
+
+def linleastsquares(X, y):
+    """
+    Fit linear least squares, given a matrix X
+    X = shape (num_params,observations)
+    y = observed data values shape (observations,)
+    
+    returns beta -- best fit parameters -- shape (num_params,)
+    """
+    beta = np.dot((np.dot( np.linalg.inv(np.dot(X.T,X)), X.T)),y)   
+    return beta
+
+x_values = np.array([11,12,13,14,15])
+X = np.array([x_values, np.ones(len(x_values)) ]).T
+
+# Doing parameter a
+y = all_best[:,0]
+# fitting y = ahat x + bhat
+ahat, bhat = linleastsquares(X,y)
+bestfit = lambda x: ahat*x + bhat
+x_plot = linspace(10,16,20)
+plt.scatter(range(11,16),all_best[:,0],label='Data points')
+plt.plot(x_plot, bestfit(x_plot),c='C1',label='Best fit')
 plt.title("$a$ as function of halo mass")
 plt.xlabel('Halo mass')
 plt.ylabel('a')
+plt.legend(frameon=False)
 plt.savefig('./plots/q3b1.png')
 plt.close()
 
-plt.scatter(range(11,16),all_best[:,1])
+# Doing parameter b
+y = all_best[:,1][:-1] # removing last datapoint
+# fitting y = ahat x + bhat
+ahat, bhat = linleastsquares(X[:-1],y)
+bestfit = lambda x: ahat*x + bhat
+plt.scatter(range(11,16),all_best[:,1],label='Data points')
+plt.plot(x_plot, bestfit(x_plot),c='C1',label='Best fit')
 plt.title("$b$ as function of halo mass")
 plt.xlabel('Halo mass')
 plt.ylabel('b')
+plt.legend(frameon=False)
 plt.savefig('./plots/q3b2.png')
 plt.close()
 
-plt.scatter(range(11,16),all_best[:,2])
+# Doing parameter c
+y = all_best[:,2][:-1] # removing last datapoint
+# fitting y = ahat x + bhat
+ahat, bhat = linleastsquares(X[:-1],y)
+bestfit = lambda x: ahat*x + bhat
+plt.scatter(range(11,16),all_best[:,2],label='Data points')
+plt.plot(x_plot, bestfit(x_plot),c='C1',label='Best fit')
 plt.title("$c$ as function of halo mass")
 plt.xlabel('Halo mass')
 plt.ylabel('c')
+plt.legend(frameon=False)
 plt.savefig('./plots/q3b3.png')
 plt.close()
