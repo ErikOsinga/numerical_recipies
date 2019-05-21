@@ -20,8 +20,14 @@ fi
 # Create movie of the frames produced by question4.py
 ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4c_*.png" -s:v 640x480 -c:v libx264 -profile:v high -level 4.0 -crf 10 -tune animation -preset slow -pix_fmt yuv420p -r 25 -threads 0 -f mp4 quest4c.mp4
 
+# The xy direction
+ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4d_xy*.png" -s:v 640x480 -c:v libx264 -profile:v high -level 4.0 -crf 10 -tune animation -preset slow -pix_fmt yuv420p -r 25 -threads 0 -f mp4 quest4dxy.mp4
 
+# The xz direction
+ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4d_xz*.png" -s:v 640x480 -c:v libx264 -profile:v high -level 4.0 -crf 10 -tune animation -preset slow -pix_fmt yuv420p -r 25 -threads 0 -f mp4 quest4dxz.mp4
 
+# The yz direction
+ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4d_yz*.png" -s:v 640x480 -c:v libx264 -profile:v high -level 4.0 -crf 10 -tune animation -preset slow -pix_fmt yuv420p -r 25 -threads 0 -f mp4 quest4dyz.mp4
 
 echo ""
 echo "Generating the pdf"
