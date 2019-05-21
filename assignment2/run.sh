@@ -29,6 +29,14 @@ ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4d_xz*.png" -s:v 640x480
 # The yz direction
 ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4d_yz*.png" -s:v 640x480 -c:v libx264 -profile:v high -level 4.0 -crf 10 -tune animation -preset slow -pix_fmt yuv420p -r 25 -threads 0 -f mp4 quest4dyz.mp4
 
+
+echo "Download data for exercise 6"
+if [ ! -e GRBs.txt ]; then
+  wget strw.leidenuniv.nl/~nobels/coursedata/GRBs.txt
+fi
+
+
+
 echo ""
 echo "Generating the pdf"
 pdflatex main.tex
