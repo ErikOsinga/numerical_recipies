@@ -9,8 +9,14 @@ if [ ! -d "plots" ]; then
   mkdir plots
 fi
 if [ ! -d "plots/movie" ]; then
-  mkdir movie
+  mkdir plots/movie
 fi
+
+echo "Download data for exercise 1"
+if [ ! -e randomnumbers.txt ]; then
+  wget strw.leidenuniv.nl/~nobels/coursedata/randomnumbers.txt
+fi
+
 
 # Run scripts and pipe output to file and terminal
 #python3 question1.py 2>&1 | tee q1output.txt
@@ -33,6 +39,11 @@ ffmpeg -framerate 30 -pattern_type glob -i "plots/movie/4d_yz*.png" -s:v 640x480
 echo "Download data for exercise 6"
 if [ ! -e GRBs.txt ]; then
   wget strw.leidenuniv.nl/~nobels/coursedata/GRBs.txt
+fi
+
+echo "Download data for exercise 7"
+if [ ! -e colliding.hdf5 ]; then
+  wget strw.leidenuniv.nl/~nobels/coursedata/colliding.hdf5
 fi
 
 
