@@ -157,7 +157,7 @@ def qvector(N, ndim):
 
 def c_field(N, model, randgauss):
     """
-    Generate a real density field with mean 0
+    Generate the Fourier space of a real density field with mean 0
     that follows a given power spectrum model.
     Very similar to code in exercise 2, except that 
     the fourier modes are now generated with
@@ -344,14 +344,131 @@ plt.close()
 # Finally, plot the position and momentum of the first 10 particles along the
 # z-direction vs a
 
+def c_k_array(N, model, randgauss, counter=0):
+    """
+    Generate NxNxN matrix of C_k values at every kx,ky_kz combination
+    C_k only depends on the modulus of the k vector. 
+    This is implicitly used in the function that generates the 2D field
+    but is not as simple to implement in the 3D field implementation.
+    Therefore we use this function.
+    
+    N         -- int: size of the field
+    model     -- Power spectrum model function of k
+    randgauss -- N**3 standard normal numbers for quick construction
+    counter   -- which random number to start at
+    """
+    dk = 2*np.pi/N
+    ks = np.zeros(N) # aranged vector of kx modes
+    # Loop over all kx modes
+    for i in range(0,N): 
+        if i <= N//2:
+            ks[i] = dk*i
+        else:
+            ks[i] = (-N+i)*dk  
+    # every particle has a 3D position
+    kvector = np.zeros((N,N,N,3))
+    ky, kx, kz = np.meshgrid(ks,ks,ks)
+    # Modulus, (64,64,64) array
+    k = np.sqrt(kx**2 + ky**2 + kz**2)
+    # Calculate the variance, set k[0,0,0] to 1 to prevent division by 0 
+    k[0,0,0] = 1
+    # Standard deviation as function of k
+    std = np.sqrt(model(k))
+    std[0,0,0] = 0 # No contribution
+    
+    # Multiply random numbers with the std to get a_k and b_k
+    a_k = std*randgauss[counter:std.size+counter].reshape(std.shape)
+    b_k = std*randgauss[counter+std.size:2*std.size+counter].reshape(std.shape)
+    
+    # Note the - and the /2
+    c_k = (a_k - 1j*b_k)/2 # (64,64,64) 
+    return c_k
+
+def c_field3D(N, model, randgauss, counter=0):
+    """
+    Generate the Fourier space of a real density field with mean 0
+    that follows a given power spectrum model.
+    The density field is generated in 3D by generating half the 3D cube and then
+    making the other half of the cube (with ky<0) the complex conjugate
+    
+    N         -- int: size of the field
+    model     -- Power spectrum model function of k
+    randgauss -- N**3 standard normal numbers for quick construction
+    counter   -- which random number to start at
+    """
+    
+    fftfield = np.zeros((N,N,N),dtype='complex')
+    # All random numbers we will ever need
+    c_k = c_k_array(N, model, randgauss, counter)
+    # One step in k
+    dk = 2*np.pi/N 
+    # The fourier frequencies are different for (un)even N
+    Neven = N%2 # add one to loops if N is uneven
+    
+    # Loop over all kz modes
+    for z in range(0,N):
+        # Loop over all kx modes
+        for i in range(0,N): 
+            # start at j=1 because we generate the kx's and kz's on the 
+            # ky-axis seperately. Additionally, only generate the 
+            # half of the fourier cube (ky>0)
+            for j in range(1,N//2+Neven):
+                # Use earlier computed c_k values
+                fftfield[i,j,z] = c_k[i,j,z]
+                
+    if Neven == 0:
+        # We have an even amount of N, so do not forget the j = N//2
+        # plane
+        for z in range(1,N//2):
+            for i in range(1,N//2):
+                fftfield[i,N//2,z] = c_k[i,j,z]
+                # Complex conjugate
+                fftfield[-i,N//2,-z] = fftfield[i,N//2,z].real - 1j*(
+                                    fftfield[i,N//2,z].imag)
+
+        # Now some numbers are their own complex conjugate.
+        # i.e., they are real.
+        fftfield[0, 0, N//2] = c_k[0,0,N//2].real
+        fftfield[0, N//2, 0] = c_k[0,N//2,0].real
+        fftfield[N//2, 0, 0] = c_k[N//2, 0, 0].real
+        
+        fftfield[0, N//2, N//2] = c_k[0,N//2,N//2].real
+        fftfield[N//2, N//2, 0] = c_k[N//2,N//2,0].real
+        fftfield[N//2, 0, N//2] = c_k[N//2, 0, N//2].real
+        
+        fftfield[N//2, N//2, N//2] = c_k[N//2, N//2, N//2].real
+        
+    # The ky=0 plane is conjugate symmetric in kx,kz
+    # so we only have to generate half of this plane
+    for z in range(1,N//2+Neven):
+        for i in range(1,N//2+Neven):
+            fftfield[i,0,z] = c_k[i,0,z]
+            # complex conjugate
+            fftfield[-i,0,-z] = c_k[i,0,z].real - 1j*c_k[i,0,z].imag
+
+    # Finally generate all modes with ky>0 by conjugating
+    # all modes with ky < 0 
+    for z in range(0,N):
+        for i in range(0,N):
+            for j in range(N//2,N):
+                fftfield[i,j,z] = fftfield[-i,-j,-z].real - 1j*fftfield[-i,-j,-z].imag
+    
+    # Don't forget that the [0,0] component of the field has to be 0
+    fftfield[0,0,0] = 0 + 1j*0   
+    
+    return fftfield
+
 
 # Now we repeat basically the same thing, except we start at z=50
 a = 1/51
 kvec = kvector(N,3)
+cfield = c_field3D(N, Peff, randgauss)
+
 # Equation 9 again seperated per dimension
-Sfield0 = scipy.fftpack.ifft2(1j*cfield*kvec[:,:,:,0])*N**2
-Sfield1 = scipy.fftpack.ifft2(1j*cfield*kvec[:,:,:,1])*N**2
-Sfield2 = scipy.fftpack.ifft2(1j*cfield*kvec[:,:,:,2])*N**2
+Sfield0 = scipy.fftpack.ifftn(1j*cfield*kvec[:,:,:,0])*N**3
+Sfield1 = scipy.fftpack.ifftn(1j*cfield*kvec[:,:,:,1])*N**3
+Sfield2 = scipy.fftpack.ifftn(1j*cfield*kvec[:,:,:,2])*N**3
+
 Sfield = np.zeros((N,N,N,3))
 Sfield[:,:,:,0] = Sfield0.real # x dimension
 Sfield[:,:,:,1] = Sfield1.real # y dimension
@@ -391,7 +508,7 @@ for i, a in enumerate(all_a):
     plt.title(f'a={a}')
     # slice in y at the center, plot x-z
     mask = ((xvec[:,:,:,1] > 31) & (xvec[:,:,:,1] < 32))
-    plt.scatter(xvec[:,:,:,0],xvec[:,:,:,2],alpha=0.5)
+    plt.scatter(xvec[:,:,:,0][mask],xvec[:,:,:,2][mask],alpha=0.5)
     plt.xlabel('$x$ (Mpc)')
     plt.ylabel('$z$ (Mpc)')
     plt.savefig(f'./plots/movie/4d_xz{i:04d}.png')
@@ -401,12 +518,11 @@ for i, a in enumerate(all_a):
     plt.title(f'a={a}')
     # slice in x at the center, plot y-z
     mask = ((xvec[:,:,:,0] > 31) & (xvec[:,:,:,0] < 32))
-    plt.scatter(xvec[:,:,:,1],xvec[:,:,:,2],alpha=0.5)
+    plt.scatter(xvec[:,:,:,1][mask],xvec[:,:,:,2][mask],alpha=0.5)
     plt.xlabel('$y$ (Mpc)')
     plt.ylabel('$z$ (Mpc)')
     plt.savefig(f'./plots/movie/4d_yz{i:04d}.png')
     plt.close()
-
 
 # Also plot the position and momentum of the first 10 particles
 # along the z-direction vs a
