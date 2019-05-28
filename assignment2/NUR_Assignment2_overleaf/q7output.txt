@@ -1,8 +1,0 @@
-Multipole moment of the Node containing the point:
-10
-Multipole moment of its parents, up to and including the root node:
-17
-23
-573
-573
-1200

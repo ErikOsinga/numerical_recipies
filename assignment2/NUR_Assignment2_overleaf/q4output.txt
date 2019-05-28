@@ -1,2 +1,0 @@
-Growth factor at z=50: 0.019607862559909386
-Analytical derivative at z=50: 34499.31530106616 s^(-1)

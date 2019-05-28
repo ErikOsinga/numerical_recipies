@@ -3,7 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.fftpack
+import numpy.fft
 import some_routines as sr
 
 
@@ -102,8 +102,8 @@ def density_field(N, model, randgauss):
     # for a GRF with mean 0
     fftfield[0,0] = 0 + 1j*0
     
-    # Multiply by N^2 to undo the normalization build into scipy
-    densfield = scipy.fftpack.ifft2(fftfield)*N**2
+    # Multiply by N^2 to undo the normalization build into numpy
+    densfield = numpy.fft.ifft2(fftfield)*N**2
     
     return fftfield, densfield
             
