@@ -95,7 +95,7 @@ class QuadTree():
         # Find all nodes in the whole graph
         all_nodes = find_chil(self.rootnode)
         
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(14, 12))
         for node in all_nodes:
             # Plot a rectangle defining the box
             box = patches.Rectangle((node.x0, node.y0)
@@ -104,8 +104,8 @@ class QuadTree():
             
         # Plot all positions
         plt.scatter(positions[:,0], positions[:,1], s=7)
-        plt.xlabel('x')
-        plt.ylabel('y')
+        plt.xlabel('x', fontsize=16)
+        plt.ylabel('y', fontsize=16)
         if save is not None:
             plt.savefig(save)
         if show: plt.show()
@@ -238,7 +238,7 @@ QT = QuadTree(positions, rnorigin, rnwidth, rnheight, 12)
 # Subdivide
 QT.subdivide()
 # Plot result
-QT.plotQTree(positions, save='./plots/q7_1.png', show=False)
+QT.plotQTree(positions, save='./plots/q7_1.pdf', show=False)
 
 
 # #### Calculate the $n=0$ multipole moment of each leaf and then recursively

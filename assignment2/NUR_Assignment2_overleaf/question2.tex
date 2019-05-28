@@ -1,0 +1,65 @@
+\section{Making an initial density field}
+In Exercise 2, we are asked to make an initial Gaussian random field. This is most easily done in Fourier space by generating a Fourier plane, which is a 2D matrix with complex entries, of which the real and imaginary parts are normal random numbers with mean zero and variance given by the power spectrum. We assume a power spectrum model $P(k) \propto k^n$. Density fields are real fields and thus we have the following symmetry in our Fourier plane
+\begin{equation}\label{eq:symmetry}
+\tilde{Y}(-\vec{k}) = \tilde{Y}*(\vec{k})
+\end{equation}
+
+
+The (1D) inverse discrete Fourier transform can be written as
+\begin{equation}
+f(n) = \sum_{j=0}^{N-1} \hat(f) e^{i \frac{2\pi}{N} jn}
+\end{equation}
+where $n$ runs from $0$ to $N-1$ and we have not defined a normalization. In this case, $n$ can be thought of as the indices of the function $f$, which is sampled at $f(0),..,f(N-1)$
+
+The mapping from integer $j$ to wave number $k$ is as follows
+\begin{equation}
+k = \frac{2\pi}{N} j
+\end{equation}
+For $-N/2 \leq j \leq N/2$.
+
+Working with indices, it is most convenient to let $j$ run from $0$ to $N-1$, this corresponds to 
+$$k=0,\frac{2\pi}{N},\frac{4\pi}{N},...,\frac{2\pi}{N}\times \frac{N}{2}, \frac{2\pi}{N}\left(-\frac{N}{2}+1\right),...,\frac{2\pi}{N}(-1) $$
+
+We only have to generate half of the Fourier plane, because of the symmetry (Eq. \ref{eq:symmetry}). Since $N=1024$ is an even number we can let our $k_y$ indices run from $0$ to $N/2=512$ to generate the upper half of the Fourier plane. Additionally, since the x-axis in the Fourier plane also consists of complex conjugates symmetric in $x$, we only have to generate half of the x-axis as well. 
+After generating the Fourier plane, we use \textit{Scipy}'s IFFT function to compute the density field, undoing the normalization build into it. 
+
+We also use the random numbers we have generated in Question 1 to speed up the generation of the random fields. 
+Our implementation below should also work for an odd number of pixels, but we have verified it only for an even number of pixels. 
+
+\lstinputlisting{question2.py}
+
+% No output.
+% % \lstinputlisting[language={}]{q1output.txt}
+
+Our script produces the following figures, see Figures \ref{fig:fig21} to \ref{fig:fig23}. As we can see, the density field becomes smoother with decreasing power spectrum index $n$. This is what we would expect, since $n=-3$ puts more power into the small $k$ modes than $n=-1$. Since small $k$ modes correspond to large physical scales, we will see larger scale correlations with the $n=-3$ power spectrum than with the $n=-1$ power spectrum. The minimum physical size impacts the maximum $k$, since $k$ is inversely proportional to the size. Similarly, the maximum physical size impacts the minimum $k$. If we choose a certain minimum physical size $\lambda_{min}$, as we have done here ($1$ kpc), our maximum physical size is given by 1024/2$\cdot \lambda_{min}$, since we have only 1024 pixels in all directions.
+
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q2_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Density field with power spectrum defined as indicated above the figure.}
+\label{fig:fig21}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q2_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Density field with power spectrum defined as indicated above the figure.}
+\label{fig:fig22}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q2_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Density field with power spectrum defined as indicated above the figure.}
+\label{fig:fig23}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\end{minipage}%
+\end{figure}

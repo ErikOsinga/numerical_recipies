@@ -1,0 +1,17 @@
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5b1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Mass of the indicated cell as a function of the $x$-position of a single particle. The mass is calculated with the NGP method.}
+\label{fig:fig35}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5b2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Mass of the indicated cell as a function of the $x$-position of a single particle. The mass is calculated with the NGP method.}
+\label{fig:fig36}
+\end{minipage}%
+\end{figure}
+

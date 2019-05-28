@@ -1,0 +1,117 @@
+\section{Linear structure growth}
+In Exercise 3, we are asked to write down the linearized density growth equation for an Einstein-de Sitter Universe and calculate the numerical solution given a set of initial conditions (case 1, 2 and 3, see the assignment).
+
+The linearized density growth equation is given by
+\begin{equation}\label{eq:growth}
+\frac{d^2D}{dt^2} + 2\frac{\dot{a}}{a} \frac{dD}{dt} = \frac{3}{2} \Omega_o H_0^2 \frac{1}{a^3}D
+\end{equation}
+With 
+\begin{equation}
+a(t) = \left(\frac{3}{2}H_0t \right)^{2/3}
+\end{equation}
+for an Einstein-de Sitter Universe. 
+The derivative of a is given by
+\begin{equation}
+\dot{a}(t) = \left(\frac{3}{2}H_0 \right)^{2/3} \frac{2}{3}t^{-1/3}
+\end{equation}
+Thus
+\begin{equation}
+\frac{\dot{a}(t)}{a(t)} = \frac{2}{3t}
+\end{equation}
+This means the term on the right-hand side of Equation \ref{eq:growth} can be written as
+\begin{equation}
+\frac{3}{2} \Omega_0 H_0^2 \frac{1}{a^3} = \frac{2}{3t^2}
+\end{equation}
+since $\Omega_0 = \Omega_M = 1$ in an Einstein-de Sitter Universe.
+Filling in these terms, we get the following differential equation:
+\begin{equation}\label{eq:ODE}
+\frac{d^2D}{dt^2} + \frac{4}{3t} \frac{dD}{dt} = \frac{2}{3t^2} D
+\end{equation}
+
+We write this as two first order differential equations by setting $D=z_1(t)$, $\frac{dD}{dt} = z_2(t)$ and $\frac{d^2D}{dt^2} = \frac{d}{dt}z_2(t)$. This gives us the equations
+\begin{equation}
+\begin{split}
+\frac{dz_1(t)}{dt} = z_2(t) \\
+\frac{dz_2(t)}{dt} = \frac{2}{3t^2} - \frac{4}{3t} z_2(t)
+\end{split}
+\end{equation}
+We use the 4-th order Runge-Kutta method to solve these two first order ordinary differential equations (ODEs) numerically. 
+
+
+
+The analytical solution to the ODE in Equation \ref{eq:ODE} can be found by rewriting it and making the ansatz $D(t) \propto t^\alpha$ based on the rewritten form:
+\begin{equation}
+t^2\frac{d^2D}{dt^2} + t\frac{4}{3} \frac{dD}{dt} = \frac{2}{3} D
+\end{equation}
+Plugging in this ansatz gives us
+\begin{equation}
+\begin{split}
+\alpha(\alpha-1)t^{\alpha-2}t^2 + \frac{4}{3}\alpha t^{\alpha-1}t -\frac{2}{3}t^\alpha = 0 \\
+\alpha(\alpha-1) + \frac{4}{3}\alpha -\frac{2}{3} = 0 \\
+\alpha^2+\frac{1}{3}\alpha -\frac{2}{3} = 0 \\
+\end{split}
+\end{equation}
+
+Which has solutions
+\begin{equation}
+\begin{split}
+\alpha = \frac{-\frac{1}{3} \pm \sqrt{\frac{1}{9}+4\times\frac{2}{3}}}{2} \\
+\alpha = -1 \mathrm{\, or \,} \frac{2}{3}
+\end{split}
+\end{equation}
+
+The solution $D_1 \propto t^{-1}$ is called the decaying mode, as the density fluctuation will decrease with time. The solution $D_2 \propto t^{\frac{2}{3}}$ is called the growing mode solution. The general solution is thus
+\begin{equation}
+D(t) = A t^{2/3} + B t^{-1}
+\end{equation}
+Where $A$ and $B$ are constants given by the initial conditions. In this case we are given $D(1)$ and $D'(1)$, so we also need
+\begin{equation}
+D'(t) = \frac{2}{3} A t^{-1/3} - B t^{-2} \\
+\end{equation}
+As such, in the case we are given the initial conditions at $t=1$, we can find $A$ and $B$ from
+\begin{equation}
+\begin{split}
+%D(1) + D'(1) = \frac{5}{3} A \\
+A = \frac{3}{5} (D(1) + D'(1)) \\
+B = D(1) - A
+\end{split}
+\end{equation}
+
+The numerical solution to the ODE is found by the code snippet below:
+
+\lstinputlisting{question3.py}
+
+% This script produces no output
+% \lstinputlisting[language={}]{q1output.txt}
+
+Our script produces the following figures, see Figures \ref{fig:fig24} to  \ref{fig:fig26}. We can see that the Runge-Kutta integrator performs very well for the first and last case, but struggles to find the correct solution for the second case. A small deviation from the analytical solution gets increasingly amplified, so the integrator goes off track at a certain point. We found that very small timesteps make the ODE solver perform better, but as time increases, an increasingly small number of timesteps was needed to perform well. This required too much computation time for a final plot.
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q3_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Numerical and analytical solution to the given ODE for case 1.}
+\label{fig:fig24}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q3_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Numerical and analytical solution to the given ODE for case 1.}
+\label{fig:fig25}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q3_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Numerical and analytical solution to the given ODE for case 1.}
+\label{fig:fig26}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\end{minipage}%
+\end{figure}

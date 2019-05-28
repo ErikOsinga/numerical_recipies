@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import kstest
+from astropy.stats import kuiper
 import some_routines as sr
 
 
@@ -90,7 +91,9 @@ plt.ylabel('Value element n+1')
 plt.savefig('./plots/q1a1.png')
 plt.close()
 
-plt.plot(all_randnum)
+plt.scatter(range(0,len(all_randnum)),all_randnum,s=10)
+# Connect them to see whether they are correlated
+plt.plot(all_randnum,lw=1,ls='solid',alpha=0.5)
 plt.title(f'First {len(all_randnum)} random numbers')
 plt.ylabel('Value element')
 plt.xlabel('Iteration')
@@ -163,6 +166,12 @@ plt.bar(bin_centers,nperbin,binwidths,label='Data',alpha=0.5)
 # Analytical pdf
 xs = sr.linspace(mu-5*sigma,mu+5*sigma,101)
 plt.plot(xs, GaussianPdf(xs,mu,sigma),label='Analytical PDF',c='C1')
+
+# Indicate theoretical 1 to 4 sigma intervals with a line
+for i in range(1,5):
+    plt.axvline(mu-i*sigma,ls='dashed',alpha=0.5,c='k')
+    plt.text(mu-i*sigma,0.1,f'{i}$\sigma$',rotation=90)
+    plt.axvline(mu+i*sigma,ls='dashed',alpha=0.5,c='k')
 
 plt.legend(frameon=False)
 plt.xlabel('x')
@@ -292,7 +301,7 @@ def KStest(x, hCDF, sorted=False):
     ECDF = sr.linspace(1,N,N)/N
     # Maximum distance above
     Dplus = sr.findmax(ECDF-hCDF)
-    # Maximum distance below, use the right points of the CDF
+    # Maximum distance below, use the left points of bins
     Dmin = sr.findmax(hCDF - sr.linspace(0,N-1,N)/N)
     
     # KS test statistic D, in a two-sided test, is the maximum of these
@@ -361,10 +370,9 @@ def KuiperTest(x, hCDF, sorted=False):
     # Maximum distance above
     distance = ECDF-hCDF
     Dplus = sr.findmax(distance) 
-    # Maximum distance below
-    distance = hCDF-ECDF
-    Dminus = sr.findmax(distance)
-    V = Dplus + Dminus
+    # Maximum distance below, use the left points of bins
+    Dminus = sr.findmax(hCDF - sr.linspace(0,N-1,N)/N)
+    V = Dplus + Dminus # Kuiper Test statistic
     
     sqN = np.sqrt(N)
     lamb = (sqN+0.155+0.24/sqN)*V
@@ -374,7 +382,7 @@ def KuiperTest(x, hCDF, sorted=False):
 
 def KStest_2sample(x1, x2, sorted=False):
     """
-    Compute the 2 sample KS Test on two datasets
+    Compute the 2 sample KS Test on two datasets x1 and x2
     
     x1     -- array:    realisation from some PDF 
     x2     -- array:    realisation from some PDF
@@ -569,6 +577,9 @@ all_numpoints = np.zeros(41)
 # Make the same plot for the Kuipers test
 all_D_kuiper = np.zeros(41)
 all_p_kuiper = np.zeros(41)
+# astropy values
+all_D_kuiper_sp = np.zeros(41)
+all_p_kuiper_sp = np.zeros(41)
 
 # 2 sample KS test for the datasets
 all_D_2s_KS = np.zeros((41,10))
@@ -577,8 +588,8 @@ all_p_2s_KS = np.zeros((41,10))
 all_D_2s_kuiper = np.zeros((41,10))
 all_p_2s_kuiper = np.zeros((41,10))
 
-# Calculate CDF of the standard normal once in advance for all datapoints
-hCDF = GaussianCdf(randgauss)
+# Calculate CDF of the standard normal once in advance
+hCDF = GaussianCdf(randgauss[:100000])
 
 # A spacing of 0.1 dex means we increase by a factor $10^{0.1}$.
 # So, to get up to $10^5$ starting from $10^1$, we have to increase 
@@ -598,7 +609,7 @@ for i in range(41):
     D, pval = KStest(curpoints,curCDF,sorted=True)
     all_D[i] = D
     all_p[i] = pval
-    # define a lambda function so scipy works without new calculations (faster)
+    # define a lambda function so scipy works without new calculations
     CDFprecalc = lambda x: curCDF
     D, pval = kstest(curpoints,CDFprecalc)
     all_D_sp[i] = D
@@ -608,6 +619,10 @@ for i in range(41):
     D, pval = KuiperTest(curpoints, curCDF, sorted=True)
     all_D_kuiper[i] = D
     all_p_kuiper[i] = pval
+    # Astropy
+    D, pval = kuiper(curpoints, CDFprecalc)
+    all_D_kuiper_sp[i] = D
+    all_p_kuiper_sp[i] = pval
     
     # Compare our random numbers the 10 sets of random numbers too
     for j in range(data.shape[1]):
@@ -622,7 +637,7 @@ for i in range(41):
         D, pval = KuiperTest_2sample(curpoints, curdata, sorted=True)
         all_D_2s_kuiper[i,j] = D
         all_p_2s_kuiper[i,j] = pval   
-            
+
 # Make a plot of the probability that it is consistent with Gaussian
 plt.plot(all_numpoints,all_p,'-o')
 plt.xlabel('Number of points')
@@ -660,19 +675,32 @@ plt.close()
 # Make a plot of the probability that it is consistent with Gaussian
 plt.plot(all_numpoints,all_p_kuiper,'-o')
 plt.xlabel('Number of points')
-plt.ylabel('$p$-value')
+plt.ylabel('p-value')
 plt.title("Kuiper's Test")
 plt.xscale('log')
 plt.savefig('./plots/q1d1.png')
 plt.close()
 
-# Make a plot to compare the statistic with scipy
-plt.plot(all_numpoints,all_D_kuiper,'-o')
+# Make a plot to compare the statistic with astropy
+plt.plot(all_numpoints,all_D_kuiper,'-o',label='My calculation',alpha=0.5)
+plt.plot(all_numpoints,all_D_kuiper_sp,'-o',label='Astropy',alpha=0.5)
 plt.xlabel('Number of points')
-plt.ylabel('Statistic D')
+plt.ylabel('Statistic V')
 plt.title("Kuiper's Test")
 plt.xscale('log')
+plt.legend(frameon=False)
 plt.savefig('./plots/q1d2.png')
+plt.close()
+
+# Make a plot to compare the p-value with astropy
+plt.plot(all_numpoints,all_p_kuiper,'-o',label='My calculation',alpha=0.5)
+plt.plot(all_numpoints,all_p_kuiper_sp,'-o',label='Astropy',alpha=0.5)
+plt.xlabel('Number of points')
+plt.ylabel('p-value')
+plt.title("Kuiper's Test")
+plt.xscale('log')
+plt.legend(frameon=False)
+plt.savefig('./plots/q1d3.png')
 plt.close()
 
 
@@ -682,8 +710,9 @@ plt.close()
 # (your choice). Which random number array(s) is are consistent with standard 
 # normal random numbers?
 
+# See above loop for the calculations
 for ds in range(data.shape[1]):
-    # Make a plot of the probability that it is consistent with Gaussian
+    # Make a plot of the probability that the dataset is consistent with Gaussian
     plt.plot(all_numpoints,all_p_2s_KS[:,ds],'-o',label='KS')
     plt.plot(all_numpoints,all_p_2s_kuiper[:,ds],'-o',label='Kuiper')
     plt.xlabel('Number of points')

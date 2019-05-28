@@ -1,0 +1,85 @@
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig10}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig11}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig12}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e3.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig13}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e4.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig14}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e5.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig15}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e6.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig16}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e7.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig17}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e8.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig18}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q1e9.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Result of the two sample tests on the datastream indicated above the figure.}
+\label{fig:fig19}
+\end{minipage}%
+\end{figure}
+

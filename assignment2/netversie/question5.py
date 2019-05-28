@@ -258,7 +258,7 @@ plt.close()
 plt.plot(all_x,cell0,'o-')
 plt.ylabel('Mass in cell 0')
 plt.xlabel('x-position of particle')
-plt.savefig('./plots/q5c1.png')
+plt.savefig('./plots/q5c2.png')
 plt.close()
 
 
@@ -315,9 +315,9 @@ plt.axvline(1.0,ls='dashed',c='k',label='Analytical result')
 plt.plot(ks,np.abs(fk)[:N//2],label='This work')
 plt.plot(ks,np.abs(fknp)[:N//2],label='Numpy',ls='dashed')
 plt.xlabel('k')
-plt.ylabel('$f(k)$')
+plt.ylabel('$|f(k)|$')
 plt.legend(frameon=False,loc='upper left')
-plt.savefig('./plots/q5d.png')
+plt.savefig('./plots/q5d1.png')
 plt.close()
 
 
@@ -379,7 +379,7 @@ plt.xlabel('$k_x$')
 plt.ylabel('$k_y$')
 cbar = plt.colorbar()
 cbar.set_label('$log_{10} |F(k)|$')
-plt.savefig('./q5e1.png')
+plt.savefig('./plots/q5e1.png')
 plt.close()
 
 def multivariateGauss(x, mean,covariance):
@@ -533,8 +533,8 @@ plt.title(f"y={8}")
 plt.imshow(cic.potential[:,8,:],extent=[0,16,16,0])
 cbar = plt.colorbar()
 cbar.set_label('$\Phi (r)$')
-plt.xlabel('y')
-plt.ylabel('z')
+plt.xlabel('z')
+plt.ylabel('x')
 plt.savefig('./plots/q5f1.png')
 plt.close()
 
@@ -548,7 +548,7 @@ plt.savefig('./plots/q5f2.png')
 plt.close()
 
 
-# #### g) se your potential field to calculate the gradient of the potential 
+# #### g) Use your potential field to calculate the gradient of the potential 
 # for the first 10 particles. Output the value of the gradient of the potential 
 # for these particles in all 3 spatial coordinates. 
 # It is important to realize that when assigning inferred quanities for particles 

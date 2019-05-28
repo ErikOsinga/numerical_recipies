@@ -1,0 +1,157 @@
+\section{Zeldovich approximation.}
+In Exercise 4, we set up the initial conditions using the Zeldovich approximation. It is given by
+\begin{equation}
+     {\bf x}(t) = {\bf q} + D(t) {\bf S}({\bf q})
+\end{equation}
+where ${\bf x}(t)$ is the position of a particle, ${\bf q} $ is the initial position, $D(t)$ is the linear growth function and {\bf S}({\bf q}) a time independent displacement vector. 
+
+
+\paragraph{a} \textbf{Calculate the growth factor at z=50 numerically with a relative accuracy of $10^-5$.}
+
+The growth factor in terms of z is given by
+\begin{equation}
+D(z) = \frac{5\Omega_m H_0^2}{2} H(z) \int_z^\infty \frac{1+z'}{H^3(z')} dz'.
+\end{equation}
+With $a = 1/(1+z)$ we have 
+\begin{equation}
+\frac{dz}{da} = -1/a^2
+\end{equation}
+Switching coordinates to $a$ thus gives us the following integral:
+\begin{equation}\label{eq:temp1}
+D(a) = \frac{5\Omega_m H_0^2}{2} H(z=1/a-1) \int_0^{a} \frac{1}{a'^{3} H^3(z'=1/a'-1)} da'.
+\end{equation}
+Where the integral bounds have switched due to the negative sign of the Jacobian. 
+With 
+\begin{equation}
+H(z)^2 = H_0^2 \left(\Omega_m(1+z)^3+\Omega_\Lambda \right),
+\end{equation}
+we can rewrite Equation \ref{eq:temp1} as
+\begin{equation}
+D(a) = \frac{5\Omega_m H_0^3}{2} \sqrt{\Omega_m a^{-3}+\Omega_\Lambda} \int_0^{1/(1+z)} \frac{1}{a'^{3} H_0^3 \left(\Omega_m a'^{-3} +\Omega_\Lambda\right)^{3/2}} da.
+\end{equation}
+From which we see that the Hubble constant at $z=0$ drops out. Simplifying the integral, we get
+\begin{equation}
+D(a) = \frac{5\Omega_m}{2} \sqrt{\Omega_m a^{-3}+\Omega_\Lambda} \int_0^{1/(1+z)} \frac{1}{\left(\Omega_m a'^{-1} +\Omega_\Lambda a'^2 \right)^{3/2}} da.
+\end{equation}
+Since the function has an integrable singularity at the limit $a=0$ we can use extended midpoint Romberg integration to integrate this function. However, it is simpler to simply evaluate the limit
+\begin{equation}
+\begin{split}
+\lim_{a \to 0} \left( \frac{1}{\Omega_m a^{-1} + \Omega_\Lambda a^2} \right) = \\
+\lim_{a \to 0} \left( \frac{1}{\Omega_m a^{-1}} \right) = \\
+\lim_{a \to 0} \left( \frac{a}{\Omega_m} \right) = 0
+\end{split}
+\end{equation}
+Thus we can simply set the function to 0 whenever we evaluate the function inside the integral at $a=0$
+
+The numerical growth factor is calculated with the Romberg routine given at the start of this report. We use an \textit{integrand} function that returns the function inside the integral, which is zero for $a=0$ as we have shown. The code snippet that calculates the numerical growth factor is given below.
+
+\lstinputlisting[linerange={0-67}]{question4.py}
+
+This script produces the following outputs:
+\lstinputlisting[language={},linerange={0-1}]{q4output.txt}
+
+
+
+\paragraph{b} \textbf{Calculate the time derivative of the growth factor.}
+
+We calculate this indirectly with
+\begin{equation}
+\dot{D}(t) = \frac{dD}{da} \dot{a}
+\end{equation}
+in which we know that $\dot{a}(z) = H(z)a(z)$. 
+We start with 
+\begin{equation}
+\begin{split}
+\frac{dD}{da} = \frac{d}{da} \left( \frac{5\Omega_m H_0^2}{2} H(a) \int_0^{a} \frac{1}{a'^{3} H^3(a')} da' \right) \\ 
+= \frac{5\Omega_m H_0^2}{2} \left(I \frac{dH}{da} + H(z) \frac{d}{da} \int_0^{a} \frac{1}{a'^{3} H^3(a')} da' \right)
+\end{split}
+\end{equation}
+where $I$ now denotes the numerical value of the integral that we have used to numerically calculate the growth factor in question 4a). The derivative of the Hubble parameter is given by
+\begin{equation}
+\begin{split}
+\frac{dH}{da} = \frac{d}{da} \left(H_0 \sqrt{\Omega_m a^{-3} + \Omega_\Lambda} \right) \\
+=  \frac{-3\Omega_mH_0}{2a^4\sqrt{\Omega_m a^{-3}+\Omega_\Lambda}}
+\end{split}
+\end{equation}
+The derivative of the integral is simply the function inside the integral evaluated at the bounds. Since we have already shown this function goes to 0 for $a=0$ this results in
+\begin{equation}
+\frac{d}{da} \int_0^{a} \frac{1}{a'^{3} H^3(a')} da' = \frac{1}{a^{3} H^3(a)}
+\end{equation}
+Thus the full (semi-) analytical expression for $dD/da$ is given by
+\begin{equation}
+\frac{5\Omega_m H_0^2}{2} \left(I \frac{-3\Omega_mH_0}{2a^4\sqrt{\Omega_m a^{-3}+\Omega_\Lambda}} + \frac{1}{a^{3} H^2(a)} \right)
+\end{equation}
+Factoring out some common terms gives
+\begin{equation}
+\frac{dD}{da} = \frac{5\Omega_m H_0^2}{2a^3 H(a)} \left( \frac{-3\Omega_m H_0^2 I}{2a} + \frac{1}{a H(a)} \right)
+\end{equation}
+Multiplying by $\dot{a} = H(a)a$ gives
+\begin{equation}
+\frac{dD}{dt} = \frac{5\Omega_m H_0^2}{2a^3 H(a)} \left( \frac{-3\Omega_m I H_0^2  H(a)}{2} + 1 \right)
+\end{equation}
+A quick dimension analysis tells us that the dimension of this derivative is $s^{-1}$ since the part in brackets is dimensionless and $H$ has dimensions $s^{-1}$.
+Finally, plugging in the values of the cosmological constants, the value of the numerical integral and $a=1/51$, the (semi-) analytical value of the derivative is given by the code snippet below.
+
+\lstinputlisting[linerange={69-93}]{question4.py}
+
+Which outputs
+\lstinputlisting[language={},linerange={2-3}]{q4output.txt}
+
+\paragraph{c} \textbf{Use the Zeldovich approximation to generate a movie of the evolution of a volume in two dimensions from a scale factor of 0.0025 until a scale factor of 1.0. Use 64x64 particles in a square grid. Your movie should contain at least 30 frames per seconds and should at least last 3 seconds. Also plot the position and momentum of the first 10 particles along the y-direction vs a.}
+
+To do question c), we define an effective power spectrum $P'(k)$ from the following equation
+\begin{equation}
+a_k = \sqrt{\frac{P(k)}{k^4}} \mathrm{Gauss}(0,1) = \sqrt{P'(k)} \mathrm{Gauss}(0,1)
+\end{equation}
+With $P'(k) = P(k)/k^4$, where $P(k)$ is the power spectrum we are given. In this way we can use almost the same code that we used for exercise 2, but with this effective power spectrum. We decided to normalize the power spectrum by an amplitude of $1/10$ after discussion with Folkert Nobels, since the particles were moving very fast making it hard to track their motion. As the power spectrum is featureless, we can choose our amplitude relatively freely. 
+
+Note that the difference between the code used to generate this Fourier plane and the one in exercise 2 is that $c_k$ is now defined as $c_k = (a_k - i b_k)/2$. Because the density field should be real, we again only have to generate half of the Fourier plane and make sure the other half is the complex conjugate of the first half.
+
+The code to generate the Fourier plane, do the IFFT for the initial positions, evolve the particles in time and make a movie is given below.
+
+\lstinputlisting[linerange={94-338}]{question4.py}
+
+
+This code outputs two figures. Figure \ref{fig:fig27} shows the $y$-position of the first 10 particles along the $y$-direction as a function of $a$. We see that they are initially defined near the grid points and that the periodic boundary conditions are indeed satisfied. Figure \ref{fig:fig28} shows the $y$-momentum of these particles as a function of $a$. A movie of the particle positions as a function of $a$ is also made by the \textit{run.sh} file, called \textit{quest4c.mp4}.
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q4c1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{The $y$-position of the first ten particles in the $y$-direction as a function of the scale factor $a$.}
+\label{fig:fig27}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q4c2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{The $y$-momentum of the first ten particles in the $y$-direction as a function of the scale factor $a$.}
+\label{fig:fig28}
+\end{minipage}%
+\end{figure}
+
+
+\paragraph{d} \textbf{Generate initial conditions for a 3D box to do an N-body simulation.}
+This question is a simple extension of Question 4c. We now generate half of the Fourier cube instead of the plane. The same symmetries hold, and the same equations hold. We choose to normalize the power spectrum with $1/100$ now for visual clarity. The code that outputs the 3D simulations is given below.
+
+\lstinputlisting[linerange={338-547}]{question4.py}
+The code generates similar plots as those in Question 4c. Figures \ref{fig:fig29} and \ref{fig:fig30} show these plots. The $z$-momentum is now apparently positive for all of the first 10 particles in the $z$-direction, which causes them to move along the same direction in Figure \ref{fig:fig29}. Three movies are now created, called \textit{quest4dxy.mpy}, \textit{quest4dxz.mpy} and \textit{quest4dyz.mpy} which show the $x$--$y$, $x$--$z$ and $y$--$z$ slices of thickness 1/64 $Mpc$ at the center of the box, respectively. Because we are now displaying a slice, particles are appearing and disappearing out of the view during the movie.
+
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q4d1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{The $z$-position of the first ten particles in the $z$-direction as a function of the scale factor $a$.}
+\label{fig:fig29}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q4d2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{The $z$-position of the first ten particles in the $z$-direction as a function of the scale factor $a$.}
+\label{fig:fig30}
+\end{minipage}%
+\end{figure}

@@ -174,12 +174,12 @@ alpha = 0.01
 for i in range(numit):
     w, b, loss[i] = gradient_descent(w, features, b, labels, alpha, True)
 
-# This plot is not required, if interested can uncomment.
-# plt.plot(loss)
-# plt.ylabel('Loss')
-# plt.xlabel('Iteration')
-# plt.savefig('./q6_loss.png')
-# plt.close()
+# This plot is not required, if not interested can comment.
+plt.plot(loss)
+plt.ylabel('Loss')
+plt.xlabel('Iteration')
+plt.savefig('./plots/q6_loss.png')
+plt.close()
 
 # Final prediction
 yhat = sigmoid(np.dot(features,w)+b)
@@ -194,7 +194,7 @@ print ("Amount Long: ", np.sum(labels))
 print ("Amount Short: ", len(labels)-np.sum(labels))
 
 print ('Amount incorrect:', np.sum(np.abs(yhat-labels)))
-print ('Accuracy', 1 - np.sum(np.abs(yhat-labels))/len(labels))
+print (f'Accuracy {1 - np.sum(np.abs(yhat-labels))/len(labels):.2f}')
 
 # Plot predicted and true values
 plt.title('Train set')
@@ -220,7 +220,7 @@ if len(test) > 0:
     print ("Amount Short: ", len(testlabels)-np.sum(testlabels))
 
     print ('Amount incorrect:', np.sum(np.abs(yhat-testlabels)))
-    print ('Accuracy', 1 - np.sum(np.abs(yhat-testlabels))/len(testlabels))
+    print (f'Accuracy {1 - np.sum(np.abs(yhat-testlabels))/len(testlabels):.2f}')
     
     plt.title('Test set')
     plt.hist(yhat.flatten(),label='Predictions',alpha=0.5)

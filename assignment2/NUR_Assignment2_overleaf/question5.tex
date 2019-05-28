@@ -1,0 +1,320 @@
+\section{Mass assignment schemes}
+This exercise is centered around particle mesh algorithms. Those algorithms use a mesh to compute the interactions between particles, rather than computed all $N_p^2$ interactions directly. 
+
+\paragraph{a} \textbf{The most simple choice for the particle shape is a point-like shape given by}
+\begin{equation}
+S(x) = \frac{1}{\Delta x} \delta(\frac{x}{\Delta x})
+\end{equation}
+\textbf{Explain how we need to assign mass in this scheme and explain why this method is called the nearest grid point (NGP) method. Code up this method yourself and display slices of the mass grid.}
+
+
+The fraction of a particle's mass assigned to the nearby cell $ijk$ is the integral of the shape function over this cell:
+\begin{equation}\label{eq:weight}
+W_x = \int_{x_{ijk} - \Delta x /2}^{x_{ijk} - \Delta x /2} S(x_p - x') dx'
+\end{equation}
+which is equivalent for the $y$ and $z$ directions. The product of the three directions is then the fraction of mass $W=W_xW_yW_z$ that is assigned to the cell $ijk$. Thus the mass assigned to a cell is in this case given by the sum of the mass of the particles that are in the cell, since $W$ is zero for all cells that do not contain the particle and one for the cell that does contain the particle (i.e., the definition of a point shape).
+\begin{equation}
+M_{ijk} = \sum_{p=1}^{N_p} m_p W(\vec{r}_p - \vec{r}_{ijk}) 
+\end{equation}
+In our implementation we simply loop over all particles once and assign their mass to the nearest cell point. The index of the nearest cell point is easily found, as it is the floored position of the particle. The implementation of NGP is given by the code snippet below.
+
+\lstinputlisting[linerange={0-60}]{question5.py}
+
+% This script produces no outputs yet
+% % \lstinputlisting[language={}]{q1output.txt}
+
+Our script produces Figures \ref{fig:fig31} to \ref{fig:fig34}. These show the $x$--$y$ slices of the mass grid calculated with the nearest gridpoint method. 
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig31}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig32}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig33}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_3.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig34}
+\end{minipage}%
+\end{figure}
+
+
+
+\paragraph{b} \textbf{To check the robustness of your implementation make a plot of the $x$ position of an individual particle and the value in cell 4 in 1 dimension. Let $x$ vary from the lowest value to the highest possible value in $x$. Repeat for cell 0.}
+
+The code snippet that does this is given below.
+
+\lstinputlisting[linerange={61-90}]{question5.py}
+
+It outputs the mass in cell 4 and cell 0 as function of the position of a single particle, see Figures \ref{fig:fig35} and \ref{fig:fig36} respectively. As we expect Figure \ref{fig:fig35} shows that the mass of cell 4 is 1 only where the particle position is between $x=4$ and $x=5$. Because of the periodic boundary conditions \ref{fig:fig36} shows that the mass in cell 4 is 1 between $x=0$ and $x=1$ and at $x=16$, since this is the same position as $x=0$. 
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5b1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Mass of the indicated cell as a function of the $x$-position of a single particle. The mass is calculated with the NGP method.}
+\label{fig:fig35}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5b2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Mass of the indicated cell as a function of the $x$-position of a single particle. The mass is calculated with the NGP method.}
+\label{fig:fig36}
+\end{minipage}%
+\end{figure}
+
+
+\paragraph{c} \textbf{Now use method that assumes particles are 3D cubes of uniform density and have the size of a grid cell. Calculate how mass needs to be assigned in this case (Cloud in Cell method) and implement it in code. To check the robustness make the same plots as before (in a and b).}
+
+For the cloud in cell (CIC) implementation, Equation \ref{eq:weight} does not change. However, since the particle does not have a point shape but a cube shape now, $W$ is non-zero for all cells that overlap with the shape of the particle. Thus, if the particle is not exactly at a center point of a cell, the particle can contribute to the cell it is currently in and the seven (in 3D, three in 2D) other neighbouring cells. We define $d_x = x_p - x_c$ as the distance between the particle and the cell in the $x$-direction, $t_x = 1-d_x$ and equivalent definitions for the $y$ and $z$ directions. The contributions of mass to each of the eight cells are linear interpolations, coded up below. Since the $CIC$ is a \textit{class}, it also contains the function to compute the gradient of the potential, which we will need later.
+
+\lstinputlisting[linerange={91-264}]{question5.py}
+
+
+This code outputs the same plots as in Question 4a and 4b. These plots are shown in Figures \ref{fig:fig37} to \ref{fig:fig42}. We seen again that \ref{fig:fig37} shows that the mass of cell 4 is maximal when the particle position is in the middle of the cell. However, for CIC the particle also contributes to neighbouring cells, so the further away the particle travels from cell $4$, the more the mass in cell 4 drops. The same is true for \ref{fig:fig38}. As another example, we see that Figure \ref{fig:fig39} shows the mass peaks are at the same cells as the NGP method (Figure \ref{fig:fig31}), but they are less pronounced since the mass now gets spread out over neighbouring cells.
+
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5c1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Mass of the indicated cell as a function of the $x$-position of a single particle. The mass is calculated with the CIC method.}
+\label{fig:fig37}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5c2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Mass of the indicated cell as a function of the $x$-position of a single particle. The mass is calculated with the CIC method.}
+\label{fig:fig38}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5c_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig39}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5c_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig40}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5c_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig41}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5c_3.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig42}
+\end{minipage}%
+\end{figure}
+
+
+
+\paragraph{d} \textbf{Write your own FFT algorithm, check that your code works with a 1D function (no Gaussian) by making a plot of the FFT and compare your result with a python package and the analytical FFT of your function. For the rest of the exercise use your own FFT.}
+
+We define the discrete Fourier transform following the convention used by \textit{Numpy} as follows:
+\begin{equation}
+H_k = \sum_{n=0}^{N-1} h_n e^{-i2\pi k n /N}
+\end{equation}
+and the inverse transform as 
+\begin{equation}
+h_n = \frac{1}{N} \sum_{k=0}^{N-1} H_k e^{i2\pi k n/N}
+\end{equation}
+where $N$ is the number of samples and $h_n$ the sampled values. We keep the $1/N$ normalization out of the python functions for convenience, but make sure to normalize it properly after calling an inverse Fourier transform routine.
+
+To test our implementation we choose the function 
+\begin{equation}\label{Eq:sin}
+f(x) = 2\sin(2\pi A x) 
+\end{equation}
+Of which the Fourier transform is trivially given by
+\begin{equation}
+f(k) = \frac{1}{2i}(\delta(k-A) - \delta(k+A))
+\end{equation}
+Thus we expect a delta function at $k=A$ and $k=-A$, we choose $A = 1$ in the code below.
+
+
+\lstinputlisting[linerange={265-323}]{question5.py}
+
+The analytical Fourier transform, our implementation of the Fourier transform and the \textit{NumPy} Fourier transform of \ref{Eq:sin} is shown in Figure \ref{fig:fig43}. We see that our implementation is done correctly.
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5d1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Discrete Fourier transform of $2sin(2\pi x)$, sampled at 64 values between 0 and $6\pi$. The analytical result is plotted as a dashed line. The FFT implemented in this work overlaps perfectly with the \textit{NumPy} FFT.}
+\label{fig:fig43}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\end{minipage}%
+\end{figure}
+
+\paragraph{e} \textbf{Generalize your own FFT algorithm to 2 and 3 dimensions and make a plot of the FFT of a 2D function and compare it with the analytical FFT. Also make a plot of the FFT of a 3D multivariate Gaussian, plot 3 slices centered at the center for the 3 different slice options.}
+
+
+For the 2D function we choose the function
+\begin{equation}\label{eq:2Dsin}
+2\sin\left(\frac{\pi}{2}(x+y)\right)
+\end{equation}
+Analogously to the 1D Fourier transform, we now expect two delta functions per dimension, at $k_{x,y} = \pm \frac{1}{4}$. Thus the 2D Fourier transform will show a square where corners are at the four possible combinations of $(k_{x},k_y)$. The 2D Fourier transform is now easily implemented as it is simply the 1D Fourier transform performed first across the rows and then across the columns (or vice versa). An equivalent method works for the 3D Fourier transform. The code that does question 1e is given below.
+
+\lstinputlisting[linerange={324-470}]{question5.py}
+
+The output of this program is shown in Figures \ref{fig:fig44} to \ref{fig:fig47}. Figure \ref{fig:fig44} shows that our implementation of the 2D Fourier transform is correct, as we indeed see the expected square with corner points at the four combinations of $k_{x,y} = \pm \frac{1}{4}$.
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5e1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Discrete Fourier transform of Equation \ref{eq:2Dsin}.}
+\label{fig:fig44}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5e2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Discrete Fourier transform of a three-dimensional multivariate Gaussian sliced at half $k_z$.}
+\label{fig:fig45}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5e3.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Discrete Fourier transform of a three-dimensional multivariate Gaussian sliced at half $k_y$.}
+\label{fig:fig46}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5e4.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Discrete Fourier transform of a three-dimensional multivariate Gaussian sliced at half $k_x$.}
+\label{fig:fig47}
+\end{minipage}%
+\end{figure}
+
+\clearpage
+\paragraph{f} \textbf{Consider again the CIC method, before this we calculated the mesh. Reduce the values of the mesh by subtracting the average and dividing by the average as $\delta = (\rho - <\rho>)/<\rho>$. Calculate the potential up to a constant for the same particles. Again make a plot of the potential of $x-y$ slices with $z$ values of 4,9,11 and 14. Also make a centered slice for the $x-z$ and $y-z$ plane.}
+
+We calculate the FFT of the potential and transform it back to get the potential, using:
+\begin{equation}
+\begin{split}
+\nabla^2 \Phi \propto \delta \rightarrow \overrightarrow{FFT} \rightarrow k^2 \hat{\Phi} \\
+\hat{\Phi} \propto \frac{\hat{\delta}}{k^2}
+\end{split}
+\end{equation}
+
+This is done in the code snippet below
+
+
+
+\lstinputlisting[linerange={471-550}]{question5.py}
+
+
+This code outputs the slices that are asked. These are given in Figures \ref{fig:fig48} - \ref{fig:fig53}. 
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5f1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Centered slice for the $x$--$z$ plane of the potential $\Phi(r)$ indicated by the colorbar.}
+\label{fig:fig48}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5f2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Centered slice for the $y$--$z$ plane of the potential $\Phi(r)$ indicated by the colorbar.}
+\label{fig:fig49}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5f_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC Potential $\Phi(r)$ grid for the z-value indicated above the plot. The color denotes the potential of a cell}
+\label{fig:fig50}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5f_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC Potential $\Phi(r)$ grid for the z-value indicated above the plot. The color denotes the potential of a cell}
+\label{fig:fig51}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5f_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC Potential $\Phi(r)$ grid for the z-value indicated above the plot. The color denotes the potential of a cell}
+\label{fig:fig52}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5f_3.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 CIC Potential $\Phi(r)$ grid for the z-value indicated above the plot. The color denotes the potential of a cell}
+\label{fig:fig53}
+\end{minipage}%
+\end{figure}
+
+
+\paragraph{g} \textbf{In simulations we often want to know the spatial gradient of the potential for the force. Use your potential field to calculate the gradient of the potential for the first 10 particles. Output the value of the gradient of the potential for these particles in all 3 spatial coordinates. It is important to realize that when assigning inferred quantities for particles they should be assigned with the same weighting as in the case of assigning the mass to the grid. Again use CIC.}
+
+The gradient of the potential of a cell is simply calculated with the central difference method. We shift the array one element down and up in both directions to calculate the gradient of the potential in every cell in both directions. The gradient of the potential is then given by interpolating back the potential of the 8 cells that contribute to the particle according to the same CIC weighting. The code for computing this gradient for the particles already appeared in sub-question 4c, but we will show it below again for completeness, look for the function called \textit{compute\_force()}. The code snippet that calls the class to compute the forces and output the gradient of the potential of the first 10 particles is also given
+
+\lstinputlisting[linerange={94-225,551-566}]{question5.py}
+
+The output of the code is as follows
+\lstinputlisting[language={}]{q5output.txt}
+

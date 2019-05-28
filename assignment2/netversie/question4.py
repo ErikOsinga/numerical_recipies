@@ -3,7 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.fftpack
+import numpy.fft
 import some_routines as sr
 
 # # 4. Zeldovich approximation.
@@ -161,8 +161,8 @@ def c_field(N, model, randgauss):
     that follows a given power spectrum model.
     Very similar to code in exercise 2, except that 
     the fourier modes are now generated with
-    c_k = (ak − ibk)/2
-    
+    c_k = (ak - ibk)/2
+        
     N         -- int: size of the field
     model     -- Power spectrum model function of k
     randgauss -- N**2 standard normal numbers for quick construction
@@ -260,9 +260,9 @@ kvec = kvector(N,2)
 
 # Calculate displacement vector. Equation 9 in Handin, seperated per dimension.
 # first dimension 
-Sfield0 = scipy.fftpack.ifft2(1j*cfield*kvec[:,:,0])*N**2
+Sfield0 = numpy.fft.ifft2(1j*cfield*kvec[:,:,0])*N**2
 # second dimension
-Sfield1 = scipy.fftpack.ifft2(1j*cfield*kvec[:,:,1])*N**2
+Sfield1 = numpy.fft.ifft2(1j*cfield*kvec[:,:,1])*N**2
 Sfield = np.zeros((N,N,2))
 Sfield[:,:,0] = Sfield0.real # x dimension
 Sfield[:,:,1] = Sfield1.real # y dimension
@@ -320,6 +320,7 @@ for i, a in enumerate(all_a):
 
 # y-position
 for i in range(10):
+    # Particles should start around y= 0(=64) to 10
     plt.plot(all_a,first_positions[:,i,1]) # plot only y coordinate
     plt.ylabel('$y$-position')
     plt.xlabel('$a$')
@@ -462,12 +463,14 @@ def c_field3D(N, model, randgauss, counter=0):
 # Now we repeat basically the same thing, except we start at z=50
 a = 1/51
 kvec = kvector(N,3)
+
+Peff = lambda k: model_n(k, -2)/(100*k**4)
 cfield = c_field3D(N, Peff, randgauss)
 
 # Equation 9 again seperated per dimension
-Sfield0 = scipy.fftpack.ifftn(1j*cfield*kvec[:,:,:,0])*N**3
-Sfield1 = scipy.fftpack.ifftn(1j*cfield*kvec[:,:,:,1])*N**3
-Sfield2 = scipy.fftpack.ifftn(1j*cfield*kvec[:,:,:,2])*N**3
+Sfield0 = numpy.fft.ifftn(1j*cfield*kvec[:,:,:,0])*N**3
+Sfield1 = numpy.fft.ifftn(1j*cfield*kvec[:,:,:,1])*N**3
+Sfield2 = numpy.fft.ifftn(1j*cfield*kvec[:,:,:,2])*N**3
 
 Sfield = np.zeros((N,N,N,3))
 Sfield[:,:,:,0] = Sfield0.real # x dimension

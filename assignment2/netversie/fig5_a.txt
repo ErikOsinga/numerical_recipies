@@ -1,0 +1,34 @@
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig31}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig32}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig33}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5a_3.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{$x$--$y$ slice of the 16x16x16 NGP mass grid for the z-value indicated above the plot. The color denotes the mass in a cell}
+\label{fig:fig34}
+\end{minipage}%
+\end{figure}
+

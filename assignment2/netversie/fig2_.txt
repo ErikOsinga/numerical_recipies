@@ -1,0 +1,30 @@
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q2_0.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Density field with power spectrum defined as indicated above the figure.}
+\label{fig:fig21}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q2_1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Density field with power spectrum defined as indicated above the figure.}
+\label{fig:fig22}
+\end{minipage}%
+\end{figure}
+
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q2_2.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Density field with power spectrum defined as indicated above the figure.}
+\label{fig:fig23}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\end{minipage}%
+\end{figure}
+

@@ -1,0 +1,17 @@
+Predicting everything as most abundant class (ZeroR) gives accuracy: 0.77
+Number of missing values per column: [  0 141 154 191 220 213]
+Amount of datapoints that have all first 3 features: 77
+Training set:
+Amount predict Long 167.0
+Amount predict Short 9.0
+Amount Long:  135.0
+Amount Short:  41.0
+Amount incorrect: 38.0
+Accuracy 0.78
+Test set:
+Amount predict Long 56.0
+Amount predict Short 3.0
+Amount Long:  47.0
+Amount Short:  12.0
+Amount incorrect: 11.0
+Accuracy 0.81

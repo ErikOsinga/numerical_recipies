@@ -1,0 +1,13 @@
+\begin{figure}[ht]\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\includegraphics[width=1.0\linewidth]{./plots/q5d1.png}
+\captionsetup{width=0.8\linewidth}
+\captionof{figure}{Discrete fourier transform of $2sin(2\pi x)$, sampled at 64 values between 0 and $6\pi$. The analytical result is plotted as a dashed line. The FFT implemented in this work overlaps perfectly with the Numpy FFT}
+\label{fig:fig43}
+\end{minipage}%
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\end{minipage}%
+\end{figure}
+
